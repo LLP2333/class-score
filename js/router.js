@@ -48,6 +48,7 @@ const Router = {
             home: '首页',
             groups: '小组管理',
             ranking: '排行榜',
+            timeline: '积分时间线',
             analysis: '数据分析',
             shop: '积分商城',
             rules: '积分规则',

@@ -80,6 +80,7 @@ const App = {
         Router.register('home', () => HomePage.render());
         Router.register('groups', () => GroupsPage.render());
         Router.register('ranking', () => RankingPage.render());
+        Router.register('timeline', () => TimelinePage.render());
         Router.register('analysis', () => AnalysisPage.render());
         Router.register('shop', () => ShopPage.render());
         Router.register('rules', () => RulesPage.render());

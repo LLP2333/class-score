@@ -975,6 +975,147 @@
     font-size: 12px;
 }
 
+/* ===== TIMELINE ===== */
+.timeline-page {
+    animation: fadeIn var(--transition-normal);
+}
+
+.timeline-filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-md);
+    align-items: flex-end;
+}
+
+.timeline-container {
+    margin-top: var(--spacing-lg);
+}
+
+.timeline {
+    position: relative;
+    padding-left: 20px;
+}
+
+.timeline::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: var(--border-light);
+}
+
+.timeline-date-group {
+    margin-bottom: var(--spacing-xl);
+}
+
+.timeline-date-header {
+    position: relative;
+    margin-bottom: var(--spacing-md);
+}
+
+.date-badge {
+    background: var(--bg-secondary);
+    color: var(--text-secondary);
+    padding: var(--spacing-xs) var(--spacing-md);
+    border-radius: var(--radius-full);
+    font-size: 14px;
+    font-weight: 600;
+    border: 1px solid var(--border-light);
+    display: inline-block;
+}
+
+.timeline-item {
+    position: relative;
+    padding-left: var(--spacing-xl);
+    margin-bottom: var(--spacing-lg);
+}
+
+.timeline-marker {
+    position: absolute;
+    left: -5px;
+    top: 8px;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: var(--border-medium);
+    border: 2px solid var(--bg-secondary);
+    z-index: 1;
+}
+
+.timeline-marker.points-positive { background: var(--green); }
+.timeline-marker.points-negative { background: var(--red); }
+
+.timeline-content {
+    background: var(--bg-card);
+    padding: var(--spacing-md);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+}
+
+.timeline-header {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    margin-bottom: var(--spacing-xs);
+    flex-wrap: wrap;
+}
+
+.timeline-header .student-name {
+    font-weight: 600;
+    font-size: 14px;
+}
+
+.timeline-time {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-left: auto;
+}
+
+.timeline-body {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.action-text {
+    font-size: 14px;
+    color: var(--text-primary);
+}
+
+.points-badge {
+    font-size: 14px;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: var(--radius-md);
+}
+
+.points-badge.points-positive {
+    color: var(--green);
+    background: var(--green-bg);
+}
+
+.points-badge.points-negative {
+    color: var(--red);
+    background: var(--red-bg);
+}
+
+.timeline-rule {
+    margin-top: var(--spacing-xs);
+    font-size: 12px;
+    color: var(--text-muted);
+    font-style: italic;
+}
+
+.group-badge {
+    padding: 2px 6px;
+    font-size: 11px;
+    border-radius: 4px;
+    color: #fff;
+    background-color: var(--group-color, var(--primary));
+}
+
 /* ===== LOADING ===== */
 .loading {
     display: flex;

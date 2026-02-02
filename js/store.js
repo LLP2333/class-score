@@ -297,14 +297,19 @@ const Store = {
     // ===== Score Records =====
     
     getScoreRecords() {
-        return this.get(this.KEYS.SCORE_RECORDS) || [];
+        return (this.get(this.KEYS.SCORE_RECORDS) || []).sort((a, b) => 
+            new Date(b.createdAt) - new Date(a.createdAt)
+        );
     },
 
     addScoreRecord(record) {
         const records = this.getScoreRecords();
+        const student = this.getStudentById(record.studentId);
+        
         const newRecord = {
             id: this.generateId(),
             studentId: record.studentId,
+            groupId: student ? student.groupId : null, // 保存记录时的小组ID
             ruleId: record.ruleId,
             score: record.score,
             reason: record.reason || '',
@@ -314,7 +319,6 @@ const Store = {
         this.set(this.KEYS.SCORE_RECORDS, records);
 
         // Update student total score
-        const student = this.getStudentById(record.studentId);
         if (student) {
             this.updateStudent(record.studentId, {
                 totalScore: student.totalScore + record.score
