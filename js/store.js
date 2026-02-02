@@ -128,6 +128,7 @@ const Store = {
             id: this.generateId(),
             name: group.name,
             color: color,
+            leaderId: group.leaderId || null,
             createdAt: new Date().toISOString()
         };
         groups.push(newGroup);
@@ -135,10 +136,78 @@ const Store = {
         return newGroup;
     },
 
+    // Set group leader (must be a member of the group)
+    setGroupLeader(groupId, studentId) {
+        const group = this.getGroupById(groupId);
+        if (!group) {
+            return { success: false, error: '小组不存在' };
+        }
+        
+        // Validate: leader must be a member of this group
+        if (studentId) {
+            const student = this.getStudentById(studentId);
+            if (!student) {
+                return { success: false, error: '学生不存在' };
+            }
+            if (student.groupId !== groupId) {
+                return { success: false, error: '组长必须是当前小组的成员' };
+            }
+        }
+        
+        this.updateGroup(groupId, { leaderId: studentId });
+        return { success: true };
+    },
+
+    // Check if student is already in another group
+    isStudentInOtherGroup(studentId, excludeGroupId = null) {
+        const student = this.getStudentById(studentId);
+        if (!student || !student.groupId) return false;
+        if (excludeGroupId && student.groupId === excludeGroupId) return false;
+        return true;
+    },
+
+    // Get student's current group
+    getStudentGroup(studentId) {
+        const student = this.getStudentById(studentId);
+        if (student && student.groupId) {
+            return this.getGroupById(student.groupId);
+        }
+        return null;
+    },
+
+    // Get group leader
+    getGroupLeader(groupId) {
+        const group = this.getGroupById(groupId);
+        if (group && group.leaderId) {
+            return this.getStudentById(group.leaderId);
+        }
+        // Default: first member (by join order, approximated by createdAt)
+        const members = this.getGroupMembers(groupId);
+        if (members.length > 0) {
+            members.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
+            return members[0];
+        }
+        return null;
+    },
+
+    // Check if student is group leader
+    isGroupLeader(groupId, studentId) {
+        const leader = this.getGroupLeader(groupId);
+        return leader && leader.id === studentId;
+    },
+
     updateGroup(id, updates) {
         const groups = this.getGroups();
         const index = groups.findIndex(g => g.id === id);
         if (index !== -1) {
+            // Validate leaderId if being updated
+            if (updates.leaderId !== undefined && updates.leaderId !== null) {
+                const student = this.getStudentById(updates.leaderId);
+                if (!student || student.groupId !== id) {
+                    // Invalid leader, clear it
+                    updates.leaderId = null;
+                }
+            }
             groups[index] = { ...groups[index], ...updates };
             this.set(this.KEYS.GROUPS, groups);
             return groups[index];
