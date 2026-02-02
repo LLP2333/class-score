@@ -648,5 +648,5 @@ const Store = {
     }
 };
 
-// Initialize demo data on first load
-Store.initDemoData();
+// Note: Demo data is NOT auto-initialized anymore.
+// Users can manually generate demo data from Settings page.
