@@ -9,6 +9,7 @@ const SettingsPage = {
 
         const classInfo = Store.getClassInfo();
         const stats = Store.getStatistics();
+        const backendStatus = Backend.getStatusInfo();
 
         container.innerHTML = `
             <div class="settings-page animate-fade-in">
@@ -21,6 +22,21 @@ const SettingsPage = {
                 </div>
 
                 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px;">
+                    <!-- Backend Sync - 后端同步 -->
+                    <div class="card" style="border: 2px solid ${backendStatus.available ? 'var(--green)' : 'var(--gray-300)'};">
+                        <div class="card-header" style="background: ${backendStatus.available ? 'var(--green-bg)' : 'var(--gray-50)'};">
+                            <h3 class="card-title">
+                                ${backendStatus.available ? '🟢' : '⚪'} 数据同步
+                                <span style="font-size: 12px; font-weight: normal; margin-left: 8px;">
+                                    ${backendStatus.available ? '(后端已连接)' : '(后端未启动)'}
+                                </span>
+                            </h3>
+                        </div>
+                        <div class="card-body">
+                            ${backendStatus.available ? this.renderBackendUI(backendStatus) : this.renderNoBackendUI()}
+                        </div>
+                    </div>
+
                     <!-- Class Info -->
                     <div class="card">
                         <div class="card-header">
@@ -139,7 +155,93 @@ const SettingsPage = {
         this.bindEvents();
     },
 
+    // 渲染无后端时的提示UI
+    renderNoBackendUI() {
+        return `
+            <div style="text-align: center; padding: 20px;">
+                <div style="font-size: 48px; margin-bottom: 12px;">💾</div>
+                <p style="color: var(--text-muted); font-size: 14px; margin-bottom: 16px;">
+                    当前使用浏览器本地存储<br>
+                    数据仅保存在此设备上
+                </p>
+                <div style="background: var(--gray-50); border-radius: 8px; padding: 12px; font-size: 13px; color: var(--text-secondary);">
+                    <strong>如需同步数据到U盘：</strong><br>
+                    1. 启动U盘上的后端程序<br>
+                    2. 刷新此页面<br>
+                    3. 登录后即可同步数据
+                </div>
+            </div>
+        `;
+    },
+
+    // 渲染有后端时的UI
+    renderBackendUI(status) {
+        if (status.loggedIn) {
+            return `
+                <div style="margin-bottom: 16px;">
+                    <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px;">
+                        <span style="font-size: 24px;">👤</span>
+                        <div>
+                            <div style="font-weight: 600;">${status.username}</div>
+                            <div style="font-size: 12px; color: var(--text-muted);">已登录</div>
+                        </div>
+                        <button class="btn btn-secondary btn-sm" id="logoutBtn" style="margin-left: auto;">
+                            退出
+                        </button>
+                    </div>
+                </div>
+                <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 12px;">
+                    同步数据到后端，下课带走U盘即可随身携带数据
+                </p>
+                <div style="display: flex; gap: 8px; margin-bottom: 12px;">
+                    <button class="btn btn-primary" id="uploadDataBtn" style="flex: 1;">
+                        📤 上传到U盘
+                    </button>
+                    <button class="btn btn-secondary" id="downloadDataBtn" style="flex: 1;">
+                        📥 从U盘下载
+                    </button>
+                </div>
+                <div style="font-size: 12px; color: var(--text-muted); text-align: center;">
+                    上传会覆盖U盘数据，下载会覆盖本地数据
+                </div>
+            `;
+        } else {
+            return `
+                <div id="authForm">
+                    <div style="display: flex; gap: 8px; margin-bottom: 12px;">
+                        <button class="btn ${this.authMode === 'login' ? 'btn-primary' : 'btn-secondary'}" 
+                                id="showLoginBtn" style="flex: 1;">登录</button>
+                        <button class="btn ${this.authMode === 'register' ? 'btn-primary' : 'btn-secondary'}" 
+                                id="showRegisterBtn" style="flex: 1;">注册</button>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">用户名</label>
+                        <input type="text" class="form-input" id="authUsername" placeholder="输入用户名">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">密码</label>
+                        <input type="password" class="form-input" id="authPassword" placeholder="输入密码">
+                    </div>
+                    <button class="btn btn-primary w-full" id="authSubmitBtn">
+                        ${this.authMode === 'register' ? '注册' : '登录'}
+                    </button>
+                    <p style="font-size: 12px; color: var(--text-muted); margin-top: 8px; text-align: center;">
+                        ${this.authMode === 'register' 
+                            ? '注册账号用于同步数据到U盘' 
+                            : '登录后可同步数据'}
+                    </p>
+                </div>
+            `;
+        }
+    },
+
+    // 认证模式
+    authMode: 'login',
+
     bindEvents() {
+        // Backend auth events
+        this.bindBackendEvents();
+
         // Save class info
         document.getElementById('saveClassInfoBtn')?.addEventListener('click', () => {
             const name = document.getElementById('className').value.trim();
@@ -302,5 +404,139 @@ const SettingsPage = {
                 this.render();
             }
         );
+    },
+
+    // 绑定后端相关事件
+    bindBackendEvents() {
+        // 切换到登录模式
+        document.getElementById('showLoginBtn')?.addEventListener('click', () => {
+            this.authMode = 'login';
+            this.render();
+        });
+
+        // 切换到注册模式
+        document.getElementById('showRegisterBtn')?.addEventListener('click', () => {
+            this.authMode = 'register';
+            this.render();
+        });
+
+        // 登录/注册提交
+        document.getElementById('authSubmitBtn')?.addEventListener('click', async () => {
+            const username = document.getElementById('authUsername')?.value.trim();
+            const password = document.getElementById('authPassword')?.value;
+
+            if (!username) {
+                App.showToast('请输入用户名', 'error');
+                return;
+            }
+            if (!password) {
+                App.showToast('请输入密码', 'error');
+                return;
+            }
+
+            const btn = document.getElementById('authSubmitBtn');
+            btn.disabled = true;
+            btn.textContent = '处理中...';
+
+            try {
+                let result;
+                if (this.authMode === 'register') {
+                    result = await Backend.register(username, password);
+                } else {
+                    result = await Backend.login(username, password);
+                }
+
+                if (result.success) {
+                    App.showToast(result.message || '操作成功', 'success');
+                    App.updateBackendStatus();
+                    
+                    // 如果登录且后端有数据，询问是否下载
+                    if (this.authMode === 'login' && result.hasRemoteData) {
+                        App.showConfirm(
+                            '检测到U盘上有保存的数据，是否下载覆盖本地数据？',
+                            async () => {
+                                const downloadResult = await Backend.downloadData();
+                                if (downloadResult.success) {
+                                    App.showToast('数据已从U盘下载', 'success');
+                                    App.updateClassInfo();
+                                }
+                                this.render();
+                            },
+                            () => this.render()
+                        );
+                    } else {
+                        this.render();
+                    }
+                } else {
+                    App.showToast(result.error || '操作失败', 'error');
+                    btn.disabled = false;
+                    btn.textContent = this.authMode === 'register' ? '注册' : '登录';
+                }
+            } catch (e) {
+                App.showToast('操作失败', 'error');
+                btn.disabled = false;
+                btn.textContent = this.authMode === 'register' ? '注册' : '登录';
+            }
+        });
+
+        // 退出登录
+        document.getElementById('logoutBtn')?.addEventListener('click', () => {
+            Backend.logout();
+            App.updateBackendStatus();
+            App.showToast('已退出登录', 'success');
+            this.render();
+        });
+
+        // 上传数据到U盘
+        document.getElementById('uploadDataBtn')?.addEventListener('click', async () => {
+            App.showConfirm(
+                '上传将覆盖U盘上的数据，确定继续吗？',
+                async () => {
+                    const btn = document.getElementById('uploadDataBtn');
+                    btn.disabled = true;
+                    btn.textContent = '上传中...';
+
+                    const result = await Backend.uploadData();
+                    
+                    if (result.success) {
+                        App.showToast('数据已上传到U盘', 'success');
+                    } else {
+                        App.showToast(result.error || '上传失败', 'error');
+                    }
+
+                    btn.disabled = false;
+                    btn.textContent = '📤 上传到U盘';
+                }
+            );
+        });
+
+        // 从U盘下载数据
+        document.getElementById('downloadDataBtn')?.addEventListener('click', async () => {
+            App.showConfirm(
+                '下载将覆盖本地数据，确定继续吗？',
+                async () => {
+                    const btn = document.getElementById('downloadDataBtn');
+                    btn.disabled = true;
+                    btn.textContent = '下载中...';
+
+                    const result = await Backend.downloadData();
+                    
+                    if (result.success) {
+                        if (result.noData) {
+                            App.showToast('U盘上暂无数据', 'warning');
+                        } else {
+                            App.showToast('数据已从U盘下载', 'success');
+                            App.updateClassInfo();
+                            this.render();
+                        }
+                    } else {
+                        App.showToast(result.error || '下载失败', 'error');
+                    }
+
+                    btn.disabled = false;
+                    btn.textContent = '📥 从U盘下载';
+                }
+            );
+        });
     }
 };

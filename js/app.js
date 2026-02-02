@@ -4,11 +4,51 @@
 
 const App = {
     // Initialize the application
-    init() {
+    async init() {
         this.setupEventListeners();
         this.registerRoutes();
         this.updateClassInfo();
+        
+        // 检测后端是否可用
+        await this.initBackend();
+        
         Router.init();
+    },
+
+    // 初始化后端连接
+    async initBackend() {
+        try {
+            const available = await Backend.init();
+            if (available) {
+                console.log('后端服务已连接');
+                this.updateBackendStatus();
+            } else {
+                console.log('后端服务不可用，使用本地存储模式');
+            }
+        } catch (e) {
+            console.log('后端初始化失败:', e);
+        }
+    },
+
+    // 更新后端状态显示
+    updateBackendStatus() {
+        const status = Backend.getStatusInfo();
+        const classInfo = document.getElementById('classInfo');
+        if (classInfo && status.available) {
+            const statusHtml = status.loggedIn 
+                ? `<span style="color: var(--green); font-size: 12px;">● ${status.username}</span>`
+                : `<span style="color: var(--orange); font-size: 12px;">● 未登录</span>`;
+            
+            const existingStatus = classInfo.querySelector('.backend-status');
+            if (existingStatus) {
+                existingStatus.innerHTML = statusHtml;
+            } else {
+                const statusEl = document.createElement('div');
+                statusEl.className = 'backend-status';
+                statusEl.innerHTML = statusHtml;
+                classInfo.appendChild(statusEl);
+            }
+        }
     },
 
     // Setup global event listeners

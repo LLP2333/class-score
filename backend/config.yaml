@@ -1,0 +1,26 @@
+# 班级积分系统后端配置
+
+server:
+  # 服务端口
+  port: 8000
+  # 允许的前端地址（CORS）
+  allowed_origins:
+    - "http://127.0.0.1"
+    - "http://localhost"
+    - "file://"
+
+# 数据存储配置
+storage:
+  # 数据目录（相对于可执行文件）
+  data_dir: "./data"
+  # SQLite数据库文件名
+  db_file: "users.db"
+  # 用户数据目录名
+  userdata_dir: "userdata"
+
+# JWT配置
+jwt:
+  # 密钥（生产环境请修改）
+  secret: "class-score-secret-key-change-in-production"
+  # Token有效期（小时）
+  expire_hours: 24
