@@ -1,0 +1,169 @@
+'use client';
+
+import { useMemo, useState } from 'react';
+import { Card, CardContent } from '@/components/ui/card';
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { useRecordStore, useStudentStore, useRuleStore, useGroupStore } from '@/store';
+import { cn, getAvatarClass } from '@/lib/utils';
+
+type FilterType = 'all' | 'add' | 'minus';
+
+export default function TimelinePage() {
+  const { records } = useRecordStore();
+  const { getStudentById } = useStudentStore();
+  const { getRuleById } = useRuleStore();
+  const { getGroupById } = useGroupStore();
+  
+  const [filter, setFilter] = useState<FilterType>('all');
+
+  // Filter and sort records
+  const filteredRecords = useMemo(() => {
+    let result = [...records];
+    
+    if (filter === 'add') {
+      result = result.filter(r => r.score > 0);
+    } else if (filter === 'minus') {
+      result = result.filter(r => r.score < 0);
+    }
+    
+    return result.sort((a, b) => 
+      new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+    );
+  }, [records, filter]);
+
+  // Group records by date
+  const groupedRecords = useMemo(() => {
+    const groups: Record<string, typeof filteredRecords> = {};
+    
+    filteredRecords.forEach(record => {
+      const date = new Date(record.createdAt).toLocaleDateString('zh-CN', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+      });
+      if (!groups[date]) {
+        groups[date] = [];
+      }
+      groups[date].push(record);
+    });
+    
+    return groups;
+  }, [filteredRecords]);
+
+  return (
+    <div className="animate-fade-in space-y-6">
+      {/* Header */}
+      <div className="flex items-center justify-between flex-wrap gap-4">
+        <h2 className="text-lg font-semibold flex items-center gap-2">
+          <span>📅</span>
+          积分时间线
+        </h2>
+        
+        <Tabs value={filter} onValueChange={(v) => setFilter(v as FilterType)}>
+          <TabsList>
+            <TabsTrigger value="all">全部</TabsTrigger>
+            <TabsTrigger value="add">加分</TabsTrigger>
+            <TabsTrigger value="minus">扣分</TabsTrigger>
+          </TabsList>
+        </Tabs>
+      </div>
+
+      {/* Timeline */}
+      {Object.keys(groupedRecords).length > 0 ? (
+        <div className="space-y-6">
+          {Object.entries(groupedRecords).map(([date, dayRecords]) => (
+            <div key={date}>
+              {/* Date header */}
+              <div className="sticky top-16 z-10 bg-background py-2">
+                <div className="inline-flex items-center gap-2 px-3 py-1 bg-muted rounded-full text-sm font-medium">
+                  <span>📆</span>
+                  {date}
+                  <span className="text-muted-foreground">({dayRecords.length}条)</span>
+                </div>
+              </div>
+              
+              {/* Records for this date */}
+              <div className="relative ml-4 pl-6 border-l-2 border-muted space-y-3 mt-3">
+                {dayRecords.map((record) => {
+                  const student = getStudentById(record.studentId);
+                  const rule = record.ruleId ? getRuleById(record.ruleId) : null;
+                  const group = record.groupId ? getGroupById(record.groupId) : null;
+                  
+                  return (
+                    <div key={record.id} className="relative">
+                      {/* Timeline dot */}
+                      <div
+                        className={cn(
+                          'absolute -left-[29px] w-4 h-4 rounded-full border-2 border-background',
+                          record.score > 0 ? 'bg-green-500' : 'bg-red-500'
+                        )}
+                      />
+                      
+                      {/* Record card */}
+                      <Card>
+                        <CardContent className="p-4">
+                          <div className="flex items-start gap-3">
+                            {/* Student avatar */}
+                            {student && (
+                              <div
+                                className={cn(
+                                  'w-10 h-10 rounded-full flex items-center justify-center text-white font-semibold flex-shrink-0',
+                                  getAvatarClass(student.avatar)
+                                )}
+                              >
+                                {student.name.charAt(0)}
+                              </div>
+                            )}
+                            
+                            {/* Content */}
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-center gap-2 flex-wrap">
+                                <span className="font-semibold">{student?.name || '未知学生'}</span>
+                                {group && (
+                                  <span className="text-xs px-2 py-0.5 bg-muted rounded-full">
+                                    {group.name}
+                                  </span>
+                                )}
+                              </div>
+                              <div className="text-sm text-muted-foreground mt-1">
+                                {rule?.icon || '📝'} {record.reason || rule?.name || '积分变动'}
+                              </div>
+                            </div>
+                            
+                            {/* Score and time */}
+                            <div className="text-right flex-shrink-0">
+                              <div
+                                className={cn(
+                                  'text-lg font-bold',
+                                  record.score > 0 ? 'text-green-600' : 'text-red-600'
+                                )}
+                              >
+                                {record.score > 0 ? '+' : ''}{record.score}
+                              </div>
+                              <div className="text-xs text-muted-foreground">
+                                {new Date(record.createdAt).toLocaleTimeString('zh-CN', {
+                                  hour: '2-digit',
+                                  minute: '2-digit'
+                                })}
+                              </div>
+                            </div>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          ))}
+        </div>
+      ) : (
+        <div className="flex flex-col items-center justify-center py-12 text-center">
+          <div className="text-6xl mb-4">📅</div>
+          <h3 className="text-lg font-medium mb-2">暂无积分记录</h3>
+          <p className="text-muted-foreground">开始为学生加减分后，记录会显示在这里</p>
+        </div>
+      )}
+    </div>
+  );
+}
