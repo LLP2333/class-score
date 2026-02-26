@@ -1,0 +1,26 @@
+services:
+  frontend:
+    build:
+      context: ./frontend
+      args:
+        # 前端访问后端的地址（浏览器端发起请求，所以是宿主机地址）
+        # 部署到服务器时改为实际地址，如 http://your-server-ip:8000
+        NEXT_PUBLIC_API_URL: "http://localhost:8000"
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+    restart: unless-stopped
+
+  backend:
+    build:
+      context: ./backend
+    ports:
+      - "8000:8000"
+    volumes:
+      # 持久化数据（SQLite数据库 + 用户数据）
+      - backend-data:/app/data
+    restart: unless-stopped
+
+volumes:
+  backend-data:
