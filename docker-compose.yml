@@ -8,6 +8,8 @@ services:
         NEXT_PUBLIC_API_URL: "http://localhost:8000"
     ports:
       - "3000:3000"
+    networks:
+      - qvqw
     depends_on:
       - backend
     restart: unless-stopped
@@ -17,6 +19,8 @@ services:
       context: ./backend
     ports:
       - "8000:8000"
+    networks:
+      - qvqw
     volumes:
       # 持久化数据（SQLite数据库 + 用户数据）
       - backend-data:/app/data
@@ -24,3 +28,7 @@ services:
 
 volumes:
   backend-data:
+
+networks:
+  qvqw:
+    external: true
