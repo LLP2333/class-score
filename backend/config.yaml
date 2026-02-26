@@ -6,7 +6,11 @@ server:
   # 允许的前端地址（CORS）
   allowed_origins:
     - "http://127.0.0.1"
+    - "http://127.0.0.1:3000"
+    - "http://127.0.0.1:3001"
     - "http://localhost"
+    - "http://localhost:3000"
+    - "http://localhost:3001"
     - "file://"
 
 # 数据存储配置

@@ -1,39 +1,103 @@
 {
   "classInfo": {
-    "createdAt": "2026-02-02T11:22:40.924Z",
+    "createdAt": "2026-02-02T14:41:56.508Z",
     "name": "我的班级",
     "teacher": "班主任"
   },
   "exchanges": [],
-  "exportedAt": "2026-02-02T11:22:40.924Z",
+  "exportedAt": "2026-02-26T01:05:36.087Z",
   "groups": [
     {
-      "color": 1,
-      "createdAt": "2026-02-02T11:22:37.084Z",
-      "id": "ml52yw0sg0th1og6v",
-      "leaderId": null,
+      "color": 3,
+      "createdAt": "2026-02-02T04:28:51.025Z",
+      "id": "ml4o6s41tlmhtf4u9",
       "name": "第一组"
     },
     {
-      "color": 2,
-      "createdAt": "2026-02-02T11:22:37.085Z",
-      "id": "ml52yw0tw4ykpi8t6",
-      "leaderId": null,
+      "color": 4,
+      "createdAt": "2026-02-02T04:28:51.025Z",
+      "id": "ml4o6s41vwaepw4iy",
       "name": "第二组"
     },
     {
-      "color": 3,
-      "createdAt": "2026-02-02T11:22:37.085Z",
-      "id": "ml52yw0tietoggbxh",
-      "leaderId": null,
+      "color": 5,
+      "createdAt": "2026-02-02T04:40:07.387Z",
+      "id": "ml4ol9zve43ad3lyx",
       "name": "第三组"
     },
     {
-      "color": 4,
-      "createdAt": "2026-02-02T11:22:37.085Z",
-      "id": "ml52yw0t91nhhle2x",
-      "leaderId": null,
+      "color": 1,
+      "createdAt": "2026-02-02T04:40:45.593Z",
+      "id": "ml4om3h57d60f1fru",
       "name": "第四组"
+    },
+    {
+      "color": 2,
+      "createdAt": "2026-02-02T04:40:54.804Z",
+      "id": "ml4omal0p3uma30xx",
+      "name": "第五组"
+    },
+    {
+      "color": 6,
+      "createdAt": "2026-02-02T04:41:02.214Z",
+      "id": "ml4omgauwergn9sc7",
+      "leaderId": "ml4ohmxwdjx4nlr7g",
+      "name": "第六组"
+    },
+    {
+      "color": 7,
+      "createdAt": "2026-02-02T04:41:10.316Z",
+      "id": "ml4ommjwj9a7p2di2",
+      "name": "第七组"
+    },
+    {
+      "color": 8,
+      "createdAt": "2026-02-02T04:41:16.684Z",
+      "id": "ml4omrgswlaw5cwgy",
+      "name": "第八组"
+    },
+    {
+      "color": 9,
+      "createdAt": "2026-02-02T04:41:23.652Z",
+      "id": "ml4omwucwrwpm04n9",
+      "name": "第九组"
+    },
+    {
+      "color": 9,
+      "createdAt": "2026-02-02T04:41:30.654Z",
+      "id": "ml4on28uhvrghi3ql",
+      "name": "第十组"
+    },
+    {
+      "color": 9,
+      "createdAt": "2026-02-02T04:41:38.330Z",
+      "id": "ml4on862byrlavl2b",
+      "name": "第十一组"
+    },
+    {
+      "color": 9,
+      "createdAt": "2026-02-02T04:41:46.008Z",
+      "id": "ml4one3cb7hioupc6",
+      "name": "第十二组"
+    },
+    {
+      "color": 9,
+      "createdAt": "2026-02-02T04:41:52.824Z",
+      "id": "ml4onjcosi72rebyb",
+      "name": "第十三组"
+    },
+    {
+      "color": 9,
+      "createdAt": "2026-02-02T04:42:01.277Z",
+      "id": "ml4onpvhyy3ihonir",
+      "leaderId": "ml4ohmxxvfnpcn3l8",
+      "name": "第十四组"
+    },
+    {
+      "color": 9,
+      "createdAt": "2026-02-02T04:42:09.279Z",
+      "id": "ml4onw1r0cwkmb4ye",
+      "name": "第十五组"
     }
   ],
   "lotteryHistory": [],
@@ -41,34 +105,138 @@
     {
       "exchangeCount": 0,
       "icon": "📓",
-      "id": "ml52yw0vbaih7nafm",
+      "id": "ml4o6yd7nu00n8v44",
       "name": "笔记本",
-      "price": 30,
+      "price": 5,
       "stock": 10
     },
     {
       "exchangeCount": 0,
-      "icon": "🖍️",
-      "id": "ml52yw0vqxtu4mxml",
-      "name": "彩色笔",
-      "price": 40,
-      "stock": 8
-    },
-    {
-      "exchangeCount": 0,
-      "icon": "✏️",
-      "id": "ml52yw0vb3dllvlsj",
-      "name": "文具套装",
-      "price": 50,
-      "stock": 5
+      "icon": "🎫",
+      "id": "ml4o6yd7ko0sguqop",
+      "name": "免作业卡",
+      "price": 5,
+      "stock": 3
     },
     {
       "exchangeCount": 0,
       "icon": "🎫",
-      "id": "ml52yw0v9d5ys0goh",
-      "name": "免作业卡",
-      "price": 100,
-      "stock": 3
+      "id": "ml4qv7r10bl8jfook",
+      "name": "制裁卡",
+      "price": 5,
+      "stock": 10
+    },
+    {
+      "exchangeCount": 0,
+      "icon": "🎫",
+      "id": "ml4qvxvi76ier5c2b",
+      "name": "反制裁卡",
+      "price": 5,
+      "stock": 10
+    },
+    {
+      "exchangeCount": 0,
+      "icon": "🎫",
+      "id": "ml4qyt51byd0t5zgk",
+      "name": "听歌卡",
+      "price": 5,
+      "stock": 10
+    },
+    {
+      "exchangeCount": 0,
+      "icon": "📓",
+      "id": "ml4qzu0e3hm8cpp63",
+      "name": "草稿本",
+      "price": 5,
+      "stock": 10
+    },
+    {
+      "exchangeCount": 0,
+      "icon": "🎁",
+      "id": "ml4r0mqn3vcamrc3j",
+      "name": "小蛋糕",
+      "price": 10,
+      "stock": 10
+    },
+    {
+      "exchangeCount": 0,
+      "icon": "📓",
+      "id": "ml4rljihuljjyax3l",
+      "name": "免批评卡",
+      "price": 5,
+      "stock": 10
+    },
+    {
+      "exchangeCount": 0,
+      "icon": "🎫",
+      "id": "ml4rp881qww3r2xhv",
+      "name": "数学课换座位卡",
+      "price": 5,
+      "stock": 10
+    },
+    {
+      "exchangeCount": 0,
+      "icon": "🎮",
+      "id": "ml4rq4u8bj4e2g7o5",
+      "name": "请全班看短视频",
+      "price": 5,
+      "stock": 10
+    },
+    {
+      "exchangeCount": 0,
+      "icon": "🎫",
+      "id": "ml4rs3rw9xkrbuada",
+      "name": "作业减半卡",
+      "price": 5,
+      "stock": 10
+    },
+    {
+      "exchangeCount": 0,
+      "icon": "🎫",
+      "id": "ml4rugfvn3bsuxm4z",
+      "name": "提问转移卡",
+      "price": 5,
+      "stock": 10
+    },
+    {
+      "exchangeCount": 0,
+      "icon": "🎫",
+      "id": "ml4rvznvzr26vyspp",
+      "name": "给全班布置作业卡",
+      "price": 5,
+      "stock": 10
+    },
+    {
+      "exchangeCount": 0,
+      "icon": "🎫",
+      "id": "ml4ry76dxbpw7i22u",
+      "name": "万能卡",
+      "price": 5,
+      "stock": 10
+    },
+    {
+      "exchangeCount": 0,
+      "icon": "📓",
+      "id": "ml4rzrry6kmp5100m",
+      "name": "给好友加作业卡",
+      "price": 5,
+      "stock": 10
+    },
+    {
+      "exchangeCount": 0,
+      "icon": "📓",
+      "id": "ml4s225hz33d2btln",
+      "name": "给朋友加5分卡",
+      "price": 5,
+      "stock": 10
+    },
+    {
+      "exchangeCount": 0,
+      "icon": "🎫",
+      "id": "ml4s2y0u1fmt8hj40",
+      "name": "老师手写表扬卡",
+      "price": 5,
+      "stock": 10
     }
   ],
   "rollCallHistory": [],
@@ -76,148 +244,579 @@
     {
       "category": "学习",
       "icon": "✋",
-      "id": "ml52yw0udnp083290",
+      "id": "ml4o6s41vwiukahad",
       "name": "课堂回答问题",
-      "score": 5,
+      "score": 2,
       "type": "add"
     },
     {
       "category": "学习",
       "icon": "📝",
-      "id": "ml52yw0ujfi38e2ht",
+      "id": "ml4o6s41qlev9pltf",
       "name": "作业优秀",
-      "score": 3,
-      "type": "add"
-    },
-    {
-      "category": "品德",
-      "icon": "🤝",
-      "id": "ml52yw0upor2zxi6x",
-      "name": "帮助同学",
-      "score": 2,
-      "type": "add"
-    },
-    {
-      "category": "学习",
-      "icon": "⭐",
-      "id": "ml52yw0ulr0iv9vzi",
-      "name": "课堂表现好",
-      "score": 2,
-      "type": "add"
-    },
-    {
-      "category": "劳动",
-      "icon": "🧹",
-      "id": "ml52yw0u73n242wno",
-      "name": "值日认真",
       "score": 2,
       "type": "add"
     },
     {
       "category": "纪律",
       "icon": "⏰",
-      "id": "ml52yw0u5802bjjlx",
+      "id": "ml4o6s41j926p7fx9",
       "name": "迟到早退",
-      "score": 3,
+      "score": 2,
       "type": "minus"
     },
     {
       "category": "学习",
       "icon": "❌",
-      "id": "ml52yw0u0sl1dmtiq",
+      "id": "ml4o6s41dv0t3f95u",
       "name": "作业未交",
-      "score": 5,
+      "score": 2,
       "type": "minus"
     },
     {
       "category": "纪律",
       "icon": "🗣️",
-      "id": "ml52yw0u5svhuty43",
-      "name": "上课说话",
+      "id": "ml4o6s41x72x276p7",
+      "name": "上课说话睡觉",
       "score": 2,
       "type": "minus"
+    },
+    {
+      "category": "学习",
+      "icon": "🎯",
+      "id": "ml4reiznwk2bjajhw",
+      "name": "按时考试",
+      "score": 2,
+      "type": "add"
     }
   ],
   "scoreRecords": [
     {
-      "createdAt": "2026-02-02T02:54:27.849Z",
-      "id": "ml52yw0uqg6awyio2",
-      "reason": "上课说话",
-      "ruleId": "ml52yw0u5svhuty43",
-      "score": -2,
-      "studentId": "ml52yw0tu9spxe42y"
+      "createdAt": "2026-02-02T12:44:55.279Z",
+      "groupId": "ml4o6s41vwaepw4iy",
+      "id": "ml55wqcvilcpshpco",
+      "reason": "加分",
+      "ruleId": null,
+      "score": 4,
+      "studentId": "ml4ohmxw6owdjx6di"
     },
     {
-      "createdAt": "2026-01-31T18:10:54.914Z",
-      "id": "ml52yw0usldjh8to1",
-      "reason": "作业优秀",
-      "ruleId": "ml52yw0ujfi38e2ht",
-      "score": 3,
-      "studentId": "ml52yw0t6y4zh01oo"
-    },
-    {
-      "createdAt": "2026-01-31T16:45:44.289Z",
-      "id": "ml52yw0u1n9gqk2vv",
-      "reason": "作业优秀",
-      "ruleId": "ml52yw0ujfi38e2ht",
-      "score": 3,
-      "studentId": "ml52yw0tdkrcbq2gg"
-    },
-    {
-      "createdAt": "2026-01-30T23:52:36.540Z",
-      "id": "ml52yw0uopw79fwrf",
-      "reason": "作业优秀",
-      "ruleId": "ml52yw0ujfi38e2ht",
-      "score": 3,
-      "studentId": "ml52yw0tz55ctqjfh"
-    },
-    {
-      "createdAt": "2026-01-30T23:19:00.669Z",
-      "id": "ml52yw0uaiavxzazw",
-      "reason": "帮助同学",
-      "ruleId": "ml52yw0upor2zxi6x",
+      "createdAt": "2026-02-02T12:44:46.077Z",
+      "groupId": "ml4o6s41vwaepw4iy",
+      "id": "ml55wj990zcd0c5un",
+      "reason": "加分",
+      "ruleId": null,
       "score": 2,
-      "studentId": "ml52yw0t2f1kvvsri"
+      "studentId": "ml4ohmxwchsa9kcnk"
     },
     {
-      "createdAt": "2026-01-30T12:12:42.382Z",
-      "id": "ml52yw0uag6nn2sa3",
-      "reason": "作业未交",
-      "ruleId": "ml52yw0u0sl1dmtiq",
-      "score": -5,
-      "studentId": "ml52yw0t4xn8ely07"
+      "createdAt": "2026-02-02T12:44:35.557Z",
+      "groupId": "ml4o6s41vwaepw4iy",
+      "id": "ml55wb510je9ru21h",
+      "reason": "加分",
+      "ruleId": null,
+      "score": 1,
+      "studentId": "ml4ohmxwfayxtaqyq"
     },
     {
-      "createdAt": "2026-01-30T10:31:37.436Z",
-      "id": "ml52yw0uonzy6wfmm",
-      "reason": "值日认真",
-      "ruleId": "ml52yw0u73n242wno",
+      "createdAt": "2026-02-02T12:44:24.138Z",
+      "groupId": "ml4omgauwergn9sc7",
+      "id": "ml55w2bu8oxj30f5m",
+      "reason": "加分",
+      "ruleId": null,
+      "score": 4,
+      "studentId": "ml4ohmxwqbrnziwke"
+    },
+    {
+      "createdAt": "2026-02-02T12:44:09.686Z",
+      "groupId": "ml4ol9zve43ad3lyx",
+      "id": "ml55vr6e8iq9ya78c",
+      "reason": "加分",
+      "ruleId": null,
+      "score": 3,
+      "studentId": "ml4ohmxwn5xde78cs"
+    },
+    {
+      "createdAt": "2026-02-02T12:43:57.067Z",
+      "groupId": "ml4om3h57d60f1fru",
+      "id": "ml55vhfv526eytika",
+      "reason": "加分",
+      "ruleId": null,
       "score": 2,
-      "studentId": "ml52yw0th99uv95hr"
+      "studentId": "ml4ohmxwvf4m87i7i"
     },
     {
-      "createdAt": "2026-01-29T16:08:33.913Z",
-      "id": "ml52yw0ukq0w1y6i7",
-      "reason": "课堂回答问题",
-      "ruleId": "ml52yw0udnp083290",
+      "createdAt": "2026-02-02T05:40:42.908Z",
+      "id": "ml4qr76kbvs0w76wu",
+      "reason": "扣分",
+      "ruleId": null,
+      "score": -1,
+      "studentId": "ml4ohmxwgj4z1ngyx"
+    },
+    {
+      "createdAt": "2026-02-02T05:40:32.671Z",
+      "id": "ml4qqza7pv65mxohq",
+      "reason": "加分",
+      "ruleId": null,
+      "score": 1,
+      "studentId": "ml4ohmxwzjy6134iw"
+    },
+    {
+      "createdAt": "2026-02-02T05:40:18.170Z",
+      "id": "ml4qqo3er7w27a82j",
+      "reason": "加分",
+      "ruleId": null,
+      "score": 2,
+      "studentId": "ml4ohmxwwmx37mdfp"
+    },
+    {
+      "createdAt": "2026-02-02T05:40:03.139Z",
+      "id": "ml4qqchv80ct8d5rm",
+      "reason": "加分",
+      "ruleId": null,
+      "score": 2,
+      "studentId": "ml4ohmxwgj4z1ngyx"
+    },
+    {
+      "createdAt": "2026-02-02T05:38:59.194Z",
+      "id": "ml4qoz5mmb201fbyi",
+      "reason": "小组加分",
+      "score": 1,
+      "studentId": "ml4ohmxxghkdb0z4l"
+    },
+    {
+      "createdAt": "2026-02-02T05:38:59.194Z",
+      "id": "ml4qoz5mibbr31qws",
+      "reason": "小组加分",
+      "score": 1,
+      "studentId": "ml4ohmxxvfnpcn3l8"
+    },
+    {
+      "createdAt": "2026-02-02T05:38:59.193Z",
+      "id": "ml4qoz5l8saw4lb0q",
+      "reason": "小组加分",
+      "score": 1,
+      "studentId": "ml4ohmxxftgkgdaxa"
+    },
+    {
+      "createdAt": "2026-02-02T05:38:59.192Z",
+      "id": "ml4qoz5kv7f1hexrw",
+      "reason": "小组加分",
+      "score": 1,
+      "studentId": "ml4ohmxwf321mu6as"
+    },
+    {
+      "createdAt": "2026-02-02T05:38:10.713Z",
+      "id": "ml4qnxqxscz6vcgfw",
+      "reason": "小组加分",
+      "score": 15,
+      "studentId": "ml4ohmxwt10ftiajp"
+    },
+    {
+      "createdAt": "2026-02-02T05:38:10.713Z",
+      "id": "ml4qnxqx37qafec8d",
+      "reason": "小组加分",
+      "score": 15,
+      "studentId": "ml4ohmxwa8hxcgffn"
+    },
+    {
+      "createdAt": "2026-02-02T05:38:10.712Z",
+      "id": "ml4qnxqwbv5awblzd",
+      "reason": "小组加分",
+      "score": 15,
+      "studentId": "ml4ohmxw1v2f4o17r"
+    },
+    {
+      "createdAt": "2026-02-02T05:38:10.711Z",
+      "id": "ml4qnxqvkssqbhez5",
+      "reason": "小组加分",
+      "score": 15,
+      "studentId": "ml4ohmxwfwo7cwtt7"
+    },
+    {
+      "createdAt": "2026-02-02T05:37:28.497Z",
+      "id": "ml4qn169c9ew1zlot",
+      "reason": "加分",
+      "ruleId": null,
       "score": 5,
-      "studentId": "ml52yw0tjqvkrl28m"
+      "studentId": "ml4ohmxwkczfeha4q"
     },
     {
-      "createdAt": "2026-01-27T11:27:03.230Z",
-      "id": "ml52yw0uacxgoith8",
-      "reason": "课堂表现好",
-      "ruleId": "ml52yw0ulr0iv9vzi",
-      "score": 2,
-      "studentId": "ml52yw0twvqn5f4tz"
+      "createdAt": "2026-02-02T05:37:21.178Z",
+      "id": "ml4qmviyl2oe2z55x",
+      "reason": "加分",
+      "ruleId": null,
+      "score": 5,
+      "studentId": "ml4ohmxw5c5iqge1e"
     },
     {
-      "createdAt": "2026-01-26T21:08:04.208Z",
-      "id": "ml52yw0u2zbrh6yod",
-      "reason": "帮助同学",
-      "ruleId": "ml52yw0upor2zxi6x",
+      "createdAt": "2026-02-02T05:37:14.351Z",
+      "id": "ml4qmq9bjwlyxe8ca",
+      "reason": "加分",
+      "ruleId": null,
+      "score": 5,
+      "studentId": "ml4ohmxwm5fqnpc1e"
+    },
+    {
+      "createdAt": "2026-02-02T05:37:05.276Z",
+      "id": "ml4qmj986ax1v5v8a",
+      "reason": "加分",
+      "ruleId": null,
+      "score": 8,
+      "studentId": "ml4ohmxwp5k4f4yf2"
+    },
+    {
+      "createdAt": "2026-02-02T05:36:01.194Z",
+      "id": "ml4ql5t64zvs8b5qw",
+      "reason": "加分",
+      "ruleId": null,
       "score": 2,
-      "studentId": "ml52yw0tcfrz5yekr"
+      "studentId": "ml4ohmxwr59txqr6s"
+    },
+    {
+      "createdAt": "2026-02-02T05:35:51.742Z",
+      "id": "ml4qkyimlqzp2oa38",
+      "reason": "加分",
+      "ruleId": null,
+      "score": 2,
+      "studentId": "ml4ohmxwx1snfl17l"
+    },
+    {
+      "createdAt": "2026-02-02T05:35:43.857Z",
+      "id": "ml4qksflji35gm2rx",
+      "reason": "加分",
+      "ruleId": null,
+      "score": 2,
+      "studentId": "ml4ohmxwd372jm7fb"
+    },
+    {
+      "createdAt": "2026-02-02T05:35:33.856Z",
+      "id": "ml4qkkps74uwgxiwh",
+      "reason": "加分",
+      "ruleId": null,
+      "score": 3,
+      "studentId": "ml4ohmxwn9j9bo58q"
+    },
+    {
+      "createdAt": "2026-02-02T05:35:08.524Z",
+      "id": "ml4qk164zvt70cwuk",
+      "reason": "加分",
+      "ruleId": null,
+      "score": 1,
+      "studentId": "ml4ohmxwfuy15fod5"
+    },
+    {
+      "createdAt": "2026-02-02T05:34:56.145Z",
+      "id": "ml4qjrm9djcnaentp",
+      "reason": "加分",
+      "ruleId": null,
+      "score": 1,
+      "studentId": "ml4ohmxwkcm0cdtjc"
+    },
+    {
+      "createdAt": "2026-02-02T05:34:01.142Z",
+      "id": "ml4qil6ed8tzey1ak",
+      "reason": "加分",
+      "ruleId": null,
+      "score": 3,
+      "studentId": "ml4ohmxw8a3i0ii6z"
+    },
+    {
+      "createdAt": "2026-02-02T05:33:48.805Z",
+      "id": "ml4qibnpm6hn78fee",
+      "reason": "加分",
+      "ruleId": null,
+      "score": 3,
+      "studentId": "ml4ohmxwqu6p8yfeq"
+    },
+    {
+      "createdAt": "2026-02-02T05:33:37.120Z",
+      "id": "ml4qi2n42xx5m1126",
+      "reason": "加分",
+      "ruleId": null,
+      "score": 5,
+      "studentId": "ml4ohmxwxnl9j3dpx"
+    },
+    {
+      "createdAt": "2026-02-02T05:32:09.859Z",
+      "id": "ml4qg7b7wlxlujy1o",
+      "reason": "加分",
+      "ruleId": null,
+      "score": 4,
+      "studentId": "ml4ohmxwfdctujeb6"
+    },
+    {
+      "createdAt": "2026-02-02T05:32:02.506Z",
+      "id": "ml4qg1mygim9ke73n",
+      "reason": "加分",
+      "ruleId": null,
+      "score": 4,
+      "studentId": "ml4ohmxwakgv8h93k"
+    },
+    {
+      "createdAt": "2026-02-02T05:31:52.088Z",
+      "id": "ml4qftlkg2mbr7ow6",
+      "reason": "加分",
+      "ruleId": null,
+      "score": 5,
+      "studentId": "ml4ohmxwmmyy7lwrz"
+    },
+    {
+      "createdAt": "2026-02-02T05:31:10.612Z",
+      "id": "ml4qexlg6fa036qb8",
+      "reason": "加分",
+      "ruleId": null,
+      "score": 1,
+      "studentId": "ml4ohmxx6584q1i6k"
+    },
+    {
+      "createdAt": "2026-02-02T05:31:03.810Z",
+      "id": "ml4qescigpgcrqvhx",
+      "reason": "加分",
+      "ruleId": null,
+      "score": 1,
+      "studentId": "ml4ohmxwr0bzvxh7h"
+    },
+    {
+      "createdAt": "2026-02-02T05:30:57.218Z",
+      "id": "ml4qen9efaiwk2ymh",
+      "reason": "加分",
+      "ruleId": null,
+      "score": 1,
+      "studentId": "ml4ohmxwiwf4vjp8k"
+    },
+    {
+      "createdAt": "2026-02-02T05:30:43.057Z",
+      "id": "ml4qecc1n0bc1z59n",
+      "reason": "加分",
+      "ruleId": null,
+      "score": 3,
+      "studentId": "ml4ohmxwxfyxe1dqh"
+    },
+    {
+      "createdAt": "2026-02-02T05:29:33.298Z",
+      "id": "ml4qcuiah68ss2v16",
+      "reason": "加分",
+      "ruleId": null,
+      "score": 12,
+      "studentId": "ml4ohmxwdjx4nlr7g"
+    },
+    {
+      "createdAt": "2026-02-02T05:29:24.529Z",
+      "id": "ml4qcnqpughmyzxj4",
+      "reason": "加分",
+      "ruleId": null,
+      "score": 12,
+      "studentId": "ml4ohmxwic8jzb7e7"
+    },
+    {
+      "createdAt": "2026-02-02T05:29:16.937Z",
+      "id": "ml4qchvtxi4ea7ufi",
+      "reason": "加分",
+      "ruleId": null,
+      "score": 12,
+      "studentId": "ml4ohmxw8kcc9wf93"
+    },
+    {
+      "createdAt": "2026-02-02T05:29:08.844Z",
+      "id": "ml4qcbn07q6qqd8bg",
+      "reason": "加分",
+      "ruleId": null,
+      "score": 13,
+      "studentId": "ml4ohmxwqbrnziwke"
+    },
+    {
+      "createdAt": "2026-02-02T05:27:38.868Z",
+      "id": "ml4qae7ovektax9nv",
+      "reason": "加分",
+      "ruleId": null,
+      "score": 2,
+      "studentId": "ml4ohmxxr2mya7vok"
+    },
+    {
+      "createdAt": "2026-02-02T05:27:29.200Z",
+      "id": "ml4qa6r4bghjpnk52",
+      "reason": "加分",
+      "ruleId": null,
+      "score": 2,
+      "studentId": "ml4ohmxw2aknz5juu"
+    },
+    {
+      "createdAt": "2026-02-02T05:27:18.856Z",
+      "id": "ml4q9yrs8y96lybxq",
+      "reason": "加分",
+      "ruleId": null,
+      "score": 4,
+      "studentId": "ml4ohmxw7t4z3hdx8"
+    },
+    {
+      "createdAt": "2026-02-02T05:25:56.905Z",
+      "id": "ml4q87jdfdjkffeya",
+      "reason": "加分",
+      "ruleId": null,
+      "score": 3,
+      "studentId": "ml4ohmxw9vuetfw66"
+    },
+    {
+      "createdAt": "2026-02-02T05:25:38.180Z",
+      "id": "ml4q7t38vsg6y0wcs",
+      "reason": "小组加分",
+      "score": 12,
+      "studentId": "ml4ohmxwrcalqeaqa"
+    },
+    {
+      "createdAt": "2026-02-02T05:25:38.180Z",
+      "id": "ml4q7t38w9796fr1q",
+      "reason": "小组加分",
+      "score": 12,
+      "studentId": "ml4ohmxwvf4m87i7i"
+    },
+    {
+      "createdAt": "2026-02-02T05:25:38.179Z",
+      "id": "ml4q7t37xkgn9a856",
+      "reason": "小组加分",
+      "score": 12,
+      "studentId": "ml4ohmxwwhb4si9uo"
+    },
+    {
+      "createdAt": "2026-02-02T05:25:38.178Z",
+      "id": "ml4q7t368nlkv1ykx",
+      "reason": "小组加分",
+      "score": 12,
+      "studentId": "ml4ohmxw9vuetfw66"
+    },
+    {
+      "createdAt": "2026-02-02T05:24:23.037Z",
+      "id": "ml4q673x63b6zadme",
+      "reason": "加分",
+      "ruleId": null,
+      "score": 4,
+      "studentId": "ml4ohmxx967wvgrpo"
+    },
+    {
+      "createdAt": "2026-02-02T05:24:12.050Z",
+      "id": "ml4q5ymqydmqd6jer",
+      "reason": "加分",
+      "ruleId": null,
+      "score": 4,
+      "studentId": "ml4ohmxxk9la5dz3w"
+    },
+    {
+      "createdAt": "2026-02-02T05:24:01.973Z",
+      "id": "ml4q5qutmy51bia08",
+      "reason": "加分",
+      "ruleId": null,
+      "score": 4,
+      "studentId": "ml4ohmxwp58fbctxh"
+    },
+    {
+      "createdAt": "2026-02-02T05:23:39.594Z",
+      "id": "ml4q59l6ce3yqxzbs",
+      "reason": "加分",
+      "ruleId": null,
+      "score": 4,
+      "studentId": "ml4ohmxwqdtthg2nc"
+    },
+    {
+      "createdAt": "2026-02-02T05:23:27.692Z",
+      "id": "ml4q50ekrtxswfy5g",
+      "reason": "加分",
+      "ruleId": null,
+      "score": 6,
+      "studentId": "ml4ohmxwn5xde78cs"
+    },
+    {
+      "createdAt": "2026-02-02T05:22:41.986Z",
+      "id": "ml4q414yotxko62k1",
+      "reason": "加分",
+      "ruleId": null,
+      "score": 2,
+      "studentId": "ml4ohmxwfayxtaqyq"
+    },
+    {
+      "createdAt": "2026-02-02T05:22:13.492Z",
+      "id": "ml4q3f5glgv5j9y1i",
+      "reason": "小组加分",
+      "score": 26,
+      "studentId": "ml4ohmxw6owdjx6di"
+    },
+    {
+      "createdAt": "2026-02-02T05:22:13.492Z",
+      "id": "ml4q3f5gr7xigzejp",
+      "reason": "小组加分",
+      "score": 26,
+      "studentId": "ml4ohmxwchsa9kcnk"
+    },
+    {
+      "createdAt": "2026-02-02T05:22:13.491Z",
+      "id": "ml4q3f5fhq9utgbff",
+      "reason": "小组加分",
+      "score": 26,
+      "studentId": "ml4ohmxwfayxtaqyq"
+    },
+    {
+      "createdAt": "2026-02-02T05:21:02.939Z",
+      "id": "ml4q1wpnbxaik2gf7",
+      "reason": "加分",
+      "ruleId": null,
+      "score": 2,
+      "studentId": "ml4ohmxw1jqfp87k5"
+    },
+    {
+      "createdAt": "2026-02-02T05:20:26.011Z",
+      "id": "ml4q147v01qhx4576",
+      "reason": "小组加分",
+      "score": 1,
+      "studentId": "ml4ohmxw1jqfp87k5"
+    },
+    {
+      "createdAt": "2026-02-02T05:20:26.011Z",
+      "id": "ml4q147v9z1eqeuu0",
+      "reason": "小组加分",
+      "score": 1,
+      "studentId": "ml4ohmxw6gm650ndp"
+    },
+    {
+      "createdAt": "2026-02-02T05:20:26.011Z",
+      "id": "ml4q147vbakhzwnkl",
+      "reason": "小组加分",
+      "score": 1,
+      "studentId": "ml4ohmxwp5ox8sw8y"
+    },
+    {
+      "createdAt": "2026-02-02T05:20:26.010Z",
+      "id": "ml4q147uuvb70b1wn",
+      "reason": "小组加分",
+      "score": 1,
+      "studentId": "ml4ohmxwvk419kn51"
+    },
+    {
+      "createdAt": "2026-02-02T05:13:00.296Z",
+      "id": "ml4prkawjy1s0528y",
+      "reason": "小组加分",
+      "score": 10,
+      "studentId": "ml4ohmxwp5ox8sw8y"
+    },
+    {
+      "createdAt": "2026-02-02T05:13:00.295Z",
+      "id": "ml4prkavdl5bj2odi",
+      "reason": "小组加分",
+      "score": 10,
+      "studentId": "ml4ohmxw1jqfp87k5"
+    },
+    {
+      "createdAt": "2026-02-02T05:13:00.295Z",
+      "id": "ml4prkavo3lsenwx5",
+      "reason": "小组加分",
+      "score": 10,
+      "studentId": "ml4ohmxw6gm650ndp"
+    },
+    {
+      "createdAt": "2026-02-02T05:13:00.294Z",
+      "id": "ml4prkauxwpylgrx9",
+      "reason": "小组加分",
+      "score": 10,
+      "studentId": "ml4ohmxwvk419kn51"
     }
   ],
   "settings": {
@@ -227,167 +826,447 @@
   },
   "students": [
     {
-      "avatar": 1,
-      "createdAt": "2026-02-02T11:22:37.085Z",
-      "groupId": "ml52yw0sg0th1og6v",
-      "id": "ml52yw0t2f1kvvsri",
-      "name": "王小明",
-      "totalScore": 105
-    },
-    {
-      "avatar": 2,
-      "createdAt": "2026-02-02T11:22:37.085Z",
-      "groupId": "ml52yw0tw4ykpi8t6",
-      "id": "ml52yw0t4xn8ely07",
-      "name": "李小红",
-      "totalScore": 112
-    },
-    {
-      "avatar": 3,
-      "createdAt": "2026-02-02T11:22:37.085Z",
-      "groupId": "ml52yw0tietoggbxh",
-      "id": "ml52yw0t6y4zh01oo",
-      "name": "张小刚",
-      "totalScore": 102
-    },
-    {
-      "avatar": 4,
-      "createdAt": "2026-02-02T11:22:37.085Z",
-      "groupId": "ml52yw0t91nhhle2x",
-      "id": "ml52yw0twvqn5f4tz",
-      "name": "刘小芳",
-      "totalScore": 94
-    },
-    {
-      "avatar": 5,
-      "createdAt": "2026-02-02T11:22:37.085Z",
-      "groupId": "ml52yw0sg0th1og6v",
-      "id": "ml52yw0tz55ctqjfh",
-      "name": "陈小华",
-      "totalScore": 99
-    },
-    {
-      "avatar": 6,
-      "createdAt": "2026-02-02T11:22:37.085Z",
-      "groupId": "ml52yw0tw4ykpi8t6",
-      "id": "ml52yw0tjqvkrl28m",
-      "name": "赵小丽",
-      "totalScore": 143
+      "avatar": 7,
+      "createdAt": "2026-02-02T04:37:17.540Z",
+      "groupId": "ml4om3h57d60f1fru",
+      "id": "ml4ohmxw9vuetfw66",
+      "name": "王妤欢",
+      "totalScore": 15
     },
     {
       "avatar": 7,
-      "createdAt": "2026-02-02T11:22:37.085Z",
-      "groupId": "ml52yw0tietoggbxh",
-      "id": "ml52yw0tdkrcbq2gg",
-      "name": "周小伟",
-      "totalScore": 95
-    },
-    {
-      "avatar": 8,
-      "createdAt": "2026-02-02T11:22:37.085Z",
-      "groupId": "ml52yw0t91nhhle2x",
-      "id": "ml52yw0tcfrz5yekr",
-      "name": "吴小燕",
-      "totalScore": 53
+      "createdAt": "2026-02-02T04:37:17.540Z",
+      "groupId": "ml4onw1r0cwkmb4ye",
+      "id": "ml4ohmxwwmx37mdfp",
+      "name": "路睿",
+      "totalScore": 2
     },
     {
       "avatar": 1,
-      "createdAt": "2026-02-02T11:22:37.085Z",
-      "groupId": "ml52yw0sg0th1og6v",
-      "id": "ml52yw0th99uv95hr",
-      "name": "孙小强",
-      "totalScore": 99
-    },
-    {
-      "avatar": 2,
-      "createdAt": "2026-02-02T11:22:37.085Z",
-      "groupId": "ml52yw0tw4ykpi8t6",
-      "id": "ml52yw0tu9spxe42y",
-      "name": "郑小雪",
-      "totalScore": 139
-    },
-    {
-      "avatar": 3,
-      "createdAt": "2026-02-02T11:22:37.085Z",
-      "groupId": "ml52yw0tietoggbxh",
-      "id": "ml52yw0tzam9sxxke",
-      "name": "王五",
-      "totalScore": 84
-    },
-    {
-      "avatar": 4,
-      "createdAt": "2026-02-02T11:22:37.085Z",
-      "groupId": "ml52yw0t91nhhle2x",
-      "id": "ml52yw0twdxtduoek",
-      "name": "李四",
-      "totalScore": 87
-    },
-    {
-      "avatar": 5,
-      "createdAt": "2026-02-02T11:22:37.085Z",
-      "groupId": "ml52yw0sg0th1og6v",
-      "id": "ml52yw0tgbgir46a3",
-      "name": "张三",
-      "totalScore": 109
-    },
-    {
-      "avatar": 6,
-      "createdAt": "2026-02-02T11:22:37.085Z",
-      "groupId": "ml52yw0tw4ykpi8t6",
-      "id": "ml52yw0tl15pp59sj",
-      "name": "刘六",
-      "totalScore": 109
+      "createdAt": "2026-02-02T04:37:17.540Z",
+      "groupId": "ml4omrgswlaw5cwgy",
+      "id": "ml4ohmxwmmyy7lwrz",
+      "name": "李俞钱",
+      "totalScore": 5
     },
     {
       "avatar": 7,
-      "createdAt": "2026-02-02T11:22:37.086Z",
-      "groupId": "ml52yw0tietoggbxh",
-      "id": "ml52yw0u2wj0gosf9",
-      "name": "陈七",
-      "totalScore": 80
+      "createdAt": "2026-02-02T04:37:17.540Z",
+      "groupId": "ml4on862byrlavl2b",
+      "id": "ml4ohmxwn9j9bo58q",
+      "name": "安恒",
+      "totalScore": 3
     },
     {
       "avatar": 8,
-      "createdAt": "2026-02-02T11:22:37.086Z",
-      "groupId": "ml52yw0t91nhhle2x",
-      "id": "ml52yw0uhhxopl75a",
-      "name": "赵八",
-      "totalScore": 148
+      "createdAt": "2026-02-02T04:37:17.540Z",
+      "groupId": "ml4omal0p3uma30xx",
+      "id": "ml4ohmxw7t4z3hdx8",
+      "name": "孙兵琦",
+      "totalScore": 4
     },
     {
       "avatar": 1,
-      "createdAt": "2026-02-02T11:22:37.086Z",
-      "groupId": "ml52yw0sg0th1og6v",
-      "id": "ml52yw0ug6syc1k07",
-      "name": "周九",
-      "totalScore": 52
+      "createdAt": "2026-02-02T04:37:17.540Z",
+      "groupId": "ml4o6s41vwaepw4iy",
+      "id": "ml4ohmxwfayxtaqyq",
+      "name": "胡俊依",
+      "totalScore": 29
+    },
+    {
+      "avatar": 6,
+      "createdAt": "2026-02-02T04:37:17.540Z",
+      "groupId": "ml4onw1r0cwkmb4ye",
+      "id": "ml4ohmxwgj4z1ngyx",
+      "name": "胡奥翔",
+      "totalScore": 1
     },
     {
       "avatar": 2,
-      "createdAt": "2026-02-02T11:22:37.086Z",
-      "groupId": "ml52yw0tw4ykpi8t6",
-      "id": "ml52yw0uu8lksvgui",
-      "name": "吴十",
-      "totalScore": 71
+      "createdAt": "2026-02-02T04:37:17.540Z",
+      "groupId": "ml4o6s41vwaepw4iy",
+      "id": "ml4ohmxw6owdjx6di",
+      "name": "陈畅",
+      "totalScore": 30
+    },
+    {
+      "avatar": 5,
+      "createdAt": "2026-02-02T04:37:17.540Z",
+      "groupId": "ml4o6s41tlmhtf4u9",
+      "id": "ml4ohmxwvk419kn51",
+      "name": "李祺",
+      "totalScore": 11
     },
     {
       "avatar": 3,
-      "createdAt": "2026-02-02T11:22:37.086Z",
-      "groupId": "ml52yw0tietoggbxh",
-      "id": "ml52yw0ug3ua1007b",
-      "name": "孙十一",
-      "totalScore": 119
+      "createdAt": "2026-02-02T04:37:17.540Z",
+      "groupId": "ml4on28uhvrghi3ql",
+      "id": "ml4ohmxwkcm0cdtjc",
+      "name": "胡家明",
+      "totalScore": 1
+    },
+    {
+      "avatar": 2,
+      "createdAt": "2026-02-02T04:37:17.540Z",
+      "groupId": "ml4omwucwrwpm04n9",
+      "id": "ml4ohmxwxnl9j3dpx",
+      "name": "李慧双",
+      "totalScore": 5
+    },
+    {
+      "avatar": 1,
+      "createdAt": "2026-02-02T04:37:17.540Z",
+      "groupId": "ml4one3cb7hioupc6",
+      "id": "ml4ohmxwp5k4f4yf2",
+      "name": "刘思彤",
+      "totalScore": 8
     },
     {
       "avatar": 4,
-      "createdAt": "2026-02-02T11:22:37.086Z",
-      "groupId": "ml52yw0t91nhhle2x",
-      "id": "ml52yw0u36qq8ahjq",
-      "name": "郑十二",
-      "totalScore": 71
+      "createdAt": "2026-02-02T04:37:17.540Z",
+      "groupId": "ml4o6s41vwaepw4iy",
+      "id": "ml4ohmxwchsa9kcnk",
+      "name": "何甜",
+      "totalScore": 28
+    },
+    {
+      "avatar": 6,
+      "createdAt": "2026-02-02T04:37:17.540Z",
+      "groupId": "ml4o6s41tlmhtf4u9",
+      "id": "ml4ohmxw1jqfp87k5",
+      "name": "刘亦凡",
+      "totalScore": 13
+    },
+    {
+      "avatar": 7,
+      "createdAt": "2026-02-02T04:37:17.540Z",
+      "groupId": "ml4onjcosi72rebyb",
+      "id": "ml4ohmxwfwo7cwtt7",
+      "name": "任静怡",
+      "totalScore": 15
+    },
+    {
+      "avatar": 3,
+      "createdAt": "2026-02-02T04:37:17.540Z",
+      "groupId": "ml4ol9zve43ad3lyx",
+      "id": "ml4ohmxwn5xde78cs",
+      "name": "张子雨",
+      "totalScore": 9
+    },
+    {
+      "avatar": 5,
+      "createdAt": "2026-02-02T04:37:17.540Z",
+      "groupId": "ml4omgauwergn9sc7",
+      "id": "ml4ohmxwqbrnziwke",
+      "name": "臧扬",
+      "totalScore": 17
+    },
+    {
+      "avatar": 5,
+      "createdAt": "2026-02-02T04:37:17.540Z",
+      "groupId": "ml4ol9zve43ad3lyx",
+      "id": "ml4ohmxwqdtthg2nc",
+      "name": "叶宇翔",
+      "totalScore": 4
+    },
+    {
+      "avatar": 1,
+      "createdAt": "2026-02-02T04:37:17.540Z",
+      "groupId": "ml4onjcosi72rebyb",
+      "id": "ml4ohmxw1v2f4o17r",
+      "name": "谭嘉欣",
+      "totalScore": 15
+    },
+    {
+      "avatar": 5,
+      "createdAt": "2026-02-02T04:37:17.540Z",
+      "groupId": "ml4onjcosi72rebyb",
+      "id": "ml4ohmxwt10ftiajp",
+      "name": "郭诗语",
+      "totalScore": 15
+    },
+    {
+      "avatar": 6,
+      "createdAt": "2026-02-02T04:37:17.540Z",
+      "groupId": "ml4omgauwergn9sc7",
+      "id": "ml4ohmxw8kcc9wf93",
+      "name": "刘宇轩",
+      "totalScore": 12
+    },
+    {
+      "avatar": 6,
+      "createdAt": "2026-02-02T04:37:17.540Z",
+      "groupId": "ml4omgauwergn9sc7",
+      "id": "ml4ohmxwic8jzb7e7",
+      "name": "牛林",
+      "totalScore": 12
+    },
+    {
+      "avatar": 6,
+      "createdAt": "2026-02-02T04:37:17.540Z",
+      "groupId": "ml4onjcosi72rebyb",
+      "id": "ml4ohmxwa8hxcgffn",
+      "name": "王怡斐",
+      "totalScore": 15
+    },
+    {
+      "avatar": 8,
+      "createdAt": "2026-02-02T04:37:17.540Z",
+      "groupId": "ml4ommjwj9a7p2di2",
+      "id": "ml4ohmxwxfyxe1dqh",
+      "name": "孟宪洁",
+      "totalScore": 3
+    },
+    {
+      "avatar": 8,
+      "createdAt": "2026-02-02T04:37:17.540Z",
+      "groupId": "ml4on862byrlavl2b",
+      "id": "ml4ohmxwd372jm7fb",
+      "name": "张钺杭",
+      "totalScore": 2
+    },
+    {
+      "avatar": 7,
+      "createdAt": "2026-02-02T04:37:17.540Z",
+      "groupId": "ml4onpvhyy3ihonir",
+      "id": "ml4ohmxwf321mu6as",
+      "name": "楚奥翔",
+      "totalScore": 1
+    },
+    {
+      "avatar": 2,
+      "createdAt": "2026-02-02T04:37:17.540Z",
+      "groupId": "ml4on862byrlavl2b",
+      "id": "ml4ohmxwx1snfl17l",
+      "name": "赵睿哲",
+      "totalScore": 2
+    },
+    {
+      "avatar": 4,
+      "createdAt": "2026-02-02T04:37:17.540Z",
+      "groupId": "ml4om3h57d60f1fru",
+      "id": "ml4ohmxwwhb4si9uo",
+      "name": "杨轩",
+      "totalScore": 12
+    },
+    {
+      "avatar": 7,
+      "createdAt": "2026-02-02T04:37:17.540Z",
+      "groupId": "ml4on28uhvrghi3ql",
+      "id": "ml4ohmxwfuy15fod5",
+      "name": "陈星睿",
+      "totalScore": 1
+    },
+    {
+      "avatar": 2,
+      "createdAt": "2026-02-02T04:37:17.540Z",
+      "groupId": "ml4omgauwergn9sc7",
+      "id": "ml4ohmxwdjx4nlr7g",
+      "name": "郭子涵",
+      "totalScore": 12
+    },
+    {
+      "avatar": 1,
+      "createdAt": "2026-02-02T04:37:17.540Z",
+      "groupId": "ml4ommjwj9a7p2di2",
+      "id": "ml4ohmxwiwf4vjp8k",
+      "name": "胡宗正",
+      "totalScore": 1
+    },
+    {
+      "avatar": 1,
+      "createdAt": "2026-02-02T04:37:17.540Z",
+      "groupId": "ml4omal0p3uma30xx",
+      "id": "ml4ohmxw2aknz5juu",
+      "name": "商家瑞",
+      "totalScore": 2
+    },
+    {
+      "avatar": 2,
+      "createdAt": "2026-02-02T04:37:17.540Z",
+      "groupId": "ml4one3cb7hioupc6",
+      "id": "ml4ohmxwm5fqnpc1e",
+      "name": "张鑫",
+      "totalScore": 5
+    },
+    {
+      "avatar": 3,
+      "createdAt": "2026-02-02T04:37:17.540Z",
+      "groupId": "ml4onw1r0cwkmb4ye",
+      "id": "ml4ohmxwzjy6134iw",
+      "name": "张孟然",
+      "totalScore": 1
+    },
+    {
+      "avatar": 3,
+      "createdAt": "2026-02-02T04:37:17.540Z",
+      "groupId": "ml4om3h57d60f1fru",
+      "id": "ml4ohmxwrcalqeaqa",
+      "name": "孙奕晨",
+      "totalScore": 12
+    },
+    {
+      "avatar": 6,
+      "createdAt": "2026-02-02T04:37:17.540Z",
+      "groupId": "ml4one3cb7hioupc6",
+      "id": "ml4ohmxw5c5iqge1e",
+      "name": "黄熙悦",
+      "totalScore": 5
+    },
+    {
+      "avatar": 2,
+      "createdAt": "2026-02-02T04:37:17.540Z",
+      "groupId": "ml4ommjwj9a7p2di2",
+      "id": "ml4ohmxwr0bzvxh7h",
+      "name": "尤明亮",
+      "totalScore": 1
+    },
+    {
+      "avatar": 5,
+      "createdAt": "2026-02-02T04:37:17.540Z",
+      "groupId": "ml4omrgswlaw5cwgy",
+      "id": "ml4ohmxwakgv8h93k",
+      "name": "温森广",
+      "totalScore": 4
+    },
+    {
+      "avatar": 1,
+      "createdAt": "2026-02-02T04:37:17.540Z",
+      "groupId": "ml4omwucwrwpm04n9",
+      "id": "ml4ohmxwqu6p8yfeq",
+      "name": "谢晨曦",
+      "totalScore": 3
+    },
+    {
+      "avatar": 3,
+      "createdAt": "2026-02-02T04:37:17.540Z",
+      "groupId": "ml4one3cb7hioupc6",
+      "id": "ml4ohmxwkczfeha4q",
+      "name": "方慧涵",
+      "totalScore": 5
+    },
+    {
+      "avatar": 7,
+      "createdAt": "2026-02-02T04:37:17.540Z",
+      "groupId": "ml4om3h57d60f1fru",
+      "id": "ml4ohmxwvf4m87i7i",
+      "name": "张欣妍",
+      "totalScore": 14
+    },
+    {
+      "avatar": 5,
+      "createdAt": "2026-02-02T04:37:17.540Z",
+      "groupId": "ml4o6s41tlmhtf4u9",
+      "id": "ml4ohmxw6gm650ndp",
+      "name": "冀俊志",
+      "totalScore": 11
+    },
+    {
+      "avatar": 2,
+      "createdAt": "2026-02-02T04:37:17.540Z",
+      "groupId": "ml4o6s41tlmhtf4u9",
+      "id": "ml4ohmxwp5ox8sw8y",
+      "name": "余鸿源",
+      "totalScore": 11
+    },
+    {
+      "avatar": 8,
+      "createdAt": "2026-02-02T04:37:17.540Z",
+      "groupId": "ml4on862byrlavl2b",
+      "id": "ml4ohmxwr59txqr6s",
+      "name": "王云飞",
+      "totalScore": 2
+    },
+    {
+      "avatar": 1,
+      "createdAt": "2026-02-02T04:37:17.540Z",
+      "groupId": "ml4omrgswlaw5cwgy",
+      "id": "ml4ohmxwfdctujeb6",
+      "name": "王鹏豪",
+      "totalScore": 4
+    },
+    {
+      "avatar": 8,
+      "createdAt": "2026-02-02T04:37:17.540Z",
+      "groupId": "ml4on28uhvrghi3ql",
+      "id": "ml4ohmxwj1s9sp4v2",
+      "name": "户子浩",
+      "totalScore": 0
+    },
+    {
+      "avatar": 4,
+      "createdAt": "2026-02-02T04:37:17.540Z",
+      "groupId": "ml4omwucwrwpm04n9",
+      "id": "ml4ohmxw8a3i0ii6z",
+      "name": "刘畅",
+      "totalScore": 3
+    },
+    {
+      "avatar": 2,
+      "createdAt": "2026-02-02T04:37:17.540Z",
+      "groupId": "ml4ol9zve43ad3lyx",
+      "id": "ml4ohmxwp58fbctxh",
+      "name": "邓子轩",
+      "totalScore": 4
+    },
+    {
+      "avatar": 3,
+      "createdAt": "2026-02-02T04:37:17.541Z",
+      "groupId": "ml4onpvhyy3ihonir",
+      "id": "ml4ohmxxftgkgdaxa",
+      "name": "王硕",
+      "totalScore": 1
+    },
+    {
+      "avatar": 6,
+      "createdAt": "2026-02-02T04:37:17.541Z",
+      "groupId": "ml4omal0p3uma30xx",
+      "id": "ml4ohmxxr2mya7vok",
+      "name": "李奥奇",
+      "totalScore": 2
+    },
+    {
+      "avatar": 1,
+      "createdAt": "2026-02-02T04:37:17.541Z",
+      "groupId": "ml4ommjwj9a7p2di2",
+      "id": "ml4ohmxx6584q1i6k",
+      "name": "罗诗涵",
+      "totalScore": 1
+    },
+    {
+      "avatar": 5,
+      "createdAt": "2026-02-02T04:37:17.541Z",
+      "groupId": "ml4ol9zve43ad3lyx",
+      "id": "ml4ohmxxk9la5dz3w",
+      "name": "张震",
+      "totalScore": 4
+    },
+    {
+      "avatar": 2,
+      "createdAt": "2026-02-02T04:37:17.541Z",
+      "groupId": "ml4onpvhyy3ihonir",
+      "id": "ml4ohmxxghkdb0z4l",
+      "name": "高子昂",
+      "totalScore": 1
+    },
+    {
+      "avatar": 1,
+      "createdAt": "2026-02-02T04:37:17.541Z",
+      "groupId": "ml4onpvhyy3ihonir",
+      "id": "ml4ohmxxvfnpcn3l8",
+      "name": "霍豫园",
+      "totalScore": 1
+    },
+    {
+      "avatar": 6,
+      "createdAt": "2026-02-02T04:37:17.541Z",
+      "groupId": "ml4ol9zve43ad3lyx",
+      "id": "ml4ohmxx967wvgrpo",
+      "name": "杨浩衔",
+      "totalScore": 4
     }
   ],
-  "syncedAt": "2026-02-02T19:22:40+08:00",
+  "syncedAt": "2026-02-26T09:05:36+08:00",
   "syncedBy": "llp",
   "version": "1.0"
 }
