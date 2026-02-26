@@ -65,12 +65,12 @@ export function AddStudentModal({ open, onClose, onSuccess }: AddStudentModalPro
 
           <div>
             <label className="text-sm font-medium mb-2 block">所属小组</label>
-            <Select value={groupId} onValueChange={setGroupId}>
+            <Select value={groupId || "__none__"} onValueChange={(v) => setGroupId(v === "__none__" ? "" : v)}>
               <SelectTrigger>
                 <SelectValue placeholder="未分组" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">未分组</SelectItem>
+                <SelectItem value="__none__">未分组</SelectItem>
                 {groups.map((group) => (
                   <SelectItem key={group.id} value={group.id}>
                     {group.name}

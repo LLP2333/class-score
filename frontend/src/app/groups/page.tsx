@@ -381,12 +381,12 @@ export default function GroupsPage() {
             </div>
             <div>
               <label className="text-sm font-medium mb-2 block">👑 指定组长</label>
-              <Select value={editGroupLeaderId} onValueChange={setEditGroupLeaderId}>
+              <Select value={editGroupLeaderId || "__none__"} onValueChange={(v) => setEditGroupLeaderId(v === "__none__" ? "" : v)}>
                 <SelectTrigger>
                   <SelectValue placeholder="自动（第一个加入的成员）" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">自动（第一个加入的成员）</SelectItem>
+                  <SelectItem value="__none__">自动（第一个加入的成员）</SelectItem>
                   {selectedGroup && getStudentsByGroupId(selectedGroup.id).map(m => (
                     <SelectItem key={m.id} value={m.id}>
                       {m.name} ({m.totalScore}分)
@@ -576,12 +576,12 @@ export default function GroupsPage() {
               </div>
               <div>
                 <label className="text-sm font-medium mb-2 block">选择小组</label>
-                <Select value={assignGroupId} onValueChange={setAssignGroupId}>
+                <Select value={assignGroupId || "__none__"} onValueChange={(v) => setAssignGroupId(v === "__none__" ? "" : v)}>
                   <SelectTrigger>
                     <SelectValue placeholder="不分组" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">不分组</SelectItem>
+                    <SelectItem value="__none__">不分组</SelectItem>
                     {groups.map(g => (
                       <SelectItem key={g.id} value={g.id}>
                         {g.name} ({getStudentsByGroupId(g.id).length}人)

@@ -88,12 +88,12 @@ export function StudentDetailModal({ student, open, onClose, onUpdate }: Student
 
             <div>
               <label className="text-sm font-medium mb-2 block">所属小组</label>
-              <Select value={editGroupId} onValueChange={setEditGroupId}>
+              <Select value={editGroupId || "__none__"} onValueChange={(v) => setEditGroupId(v === "__none__" ? "" : v)}>
                 <SelectTrigger>
                   <SelectValue placeholder="未分组" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">未分组</SelectItem>
+                  <SelectItem value="__none__">未分组</SelectItem>
                   {groups.map((g) => (
                     <SelectItem key={g.id} value={g.id}>
                       {g.name}
