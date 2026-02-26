@@ -24,6 +24,8 @@ services:
     volumes:
       # 持久化数据（SQLite数据库 + 用户数据）
       - backend-data:/app/data
+      # 映射配置文件，方便在宿主机修改
+      - ./backend/config.yaml:/app/config.yaml
     restart: unless-stopped
 
 volumes:
