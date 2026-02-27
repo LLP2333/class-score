@@ -132,3 +132,78 @@
 - **趋势图表**：班级积分趋势折线图（按周展示）
 - **排行榜**：实时积分排行榜
 - **导出功能**：一键导出Excel报表
+
+
+## 部署指南
+
+### 本地开发（Docker Compose）
+
+```bash
+# 创建网络
+docker network create qvqw
+
+# 构建并启动
+docker compose up -d
+```
+
+默认前端地址 `http://localhost:3000`，后端地址 `http://localhost:8000`。
+
+### 跨架构构建（M 芯片 Mac → x86 服务器）
+
+适用于在 Apple Silicon Mac 上构建，部署到 x86_64 Linux 服务器的场景。
+
+**1. 创建多平台 builder**
+
+```bash
+docker buildx create --name multiarch --use
+docker buildx inspect --bootstrap
+```
+
+**2. 登录 DockerHub**
+
+```bash
+docker login
+```
+
+**3. 构建并推送镜像**
+
+> 将 `yourusername` 替换为你的 DockerHub 用户名，`your-server-ip` 替换为服务器实际 IP。
+
+```bash
+# 构建并推送 backend
+docker buildx build \
+  --platform linux/amd64,linux/arm64 \
+  -t yourusername/classscore-backend:latest \
+  --push \
+  ./backend
+
+# 构建并推送 frontend
+docker buildx build \
+  --platform linux/amd64,linux/arm64 \
+  --build-arg NEXT_PUBLIC_API_URL="http://your-server-ip:8000" \
+  -t yourusername/classscore-frontend:latest \
+  --push \
+  ./frontend
+```
+
+> `NEXT_PUBLIC_API_URL` 会在构建时写入前端代码，必须填写服务器的实际访问地址。
+
+**4. 在服务器上部署**
+
+服务器上无需源码，只需 `docker-compose.prod.yml` 和 `config.yaml`：
+
+```bash
+# 创建网络
+docker network create qvqw
+
+# 拉取镜像并启动
+docker compose -f docker-compose.prod.yml pull
+docker compose -f docker-compose.prod.yml up -d
+```
+
+### 注意事项
+
+- 跨架构构建通过 QEMU 模拟，速度会比原生构建慢
+- 默认构建 `linux/amd64` 和 `linux/arm64` 双架构镜像，可在 x86 和 ARM 服务器上运行
+- 后端数据通过 Docker Volume `backend-data` 持久化，升级镜像不会丢失数据
+

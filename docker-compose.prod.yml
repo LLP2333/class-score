@@ -1,0 +1,30 @@
+services:
+  frontend:
+    image: llp2333/classscore-frontend:latest
+    container_name: classscore-frontend
+    ports:
+      - "3000:3000"
+    networks:
+      - qvqw
+    depends_on:
+      - backend
+    restart: unless-stopped
+
+  backend:
+    image: llp2333/classscore-backend:latest
+    container_name: classscore-backend
+    ports:
+      - "8000:8000"
+    networks:
+      - qvqw
+    volumes:
+      - backend-data:/app/data
+      - ./config.yaml:/app/config.yaml
+    restart: unless-stopped
+
+volumes:
+  backend-data:
+
+networks:
+  qvqw:
+    external: true
