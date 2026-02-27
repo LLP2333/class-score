@@ -167,21 +167,21 @@ docker login
 
 **3. 构建并推送镜像**
 
-> 将 `yourusername` 替换为你的 DockerHub 用户名，`your-server-ip` 替换为服务器实际 IP。
+> 将 `llp2333` 替换为你的 DockerHub 用户名，`https://api-class-score.qvqw.date` 替换为服务端实际地址。
 
 ```bash
 # 构建并推送 backend
 docker buildx build \
   --platform linux/amd64,linux/arm64 \
-  -t yourusername/classscore-backend:latest \
+  -t llp2333/classscore-backend:latest \
   --push \
   ./backend
 
 # 构建并推送 frontend
 docker buildx build \
   --platform linux/amd64,linux/arm64 \
-  --build-arg NEXT_PUBLIC_API_URL="http://your-server-ip:8000" \
-  -t yourusername/classscore-frontend:latest \
+  --build-arg NEXT_PUBLIC_API_URL="https://api-class-score.qvqw.date" \
+  -t llp2333/classscore-frontend:latest \
   --push \
   ./frontend
 ```
