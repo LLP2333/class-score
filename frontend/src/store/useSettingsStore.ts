@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import type { ClassInfo, Settings, RollCallRecord, LotteryRecord } from '@/types';
+import type { ClassInfo, Settings, RollCallRecord } from '@/types';
 import { generateId } from '@/lib/utils';
 
 interface SettingsStore {
@@ -16,11 +16,6 @@ interface SettingsStore {
   rollCallHistory: RollCallRecord[];
   addRollCallRecord: (students: string[]) => RollCallRecord;
   setRollCallHistory: (history: RollCallRecord[]) => void;
-  
-  // Lottery history
-  lotteryHistory: LotteryRecord[];
-  addLotteryRecord: (prize: string, studentId: string) => LotteryRecord;
-  setLotteryHistory: (history: LotteryRecord[]) => void;
   
   // Clear all
   clearAll: () => void;
@@ -44,7 +39,6 @@ export const useSettingsStore = create<SettingsStore>()(
       classInfo: defaultClassInfo,
       settings: defaultSettings,
       rollCallHistory: [],
-      lotteryHistory: [],
       
       setClassInfo: (info) => {
         set((state) => ({
@@ -77,31 +71,11 @@ export const useSettingsStore = create<SettingsStore>()(
         set({ rollCallHistory: history });
       },
       
-      addLotteryRecord: (prize, studentId) => {
-        const record: LotteryRecord = {
-          id: generateId(),
-          prize,
-          studentId,
-          createdAt: new Date().toISOString(),
-        };
-        set((state) => {
-          const history = [record, ...state.lotteryHistory];
-          if (history.length > 50) history.pop();
-          return { lotteryHistory: history };
-        });
-        return record;
-      },
-      
-      setLotteryHistory: (history) => {
-        set({ lotteryHistory: history });
-      },
-      
       clearAll: () => {
         set({
           classInfo: defaultClassInfo,
           settings: defaultSettings,
           rollCallHistory: [],
-          lotteryHistory: [],
         });
       },
     }),

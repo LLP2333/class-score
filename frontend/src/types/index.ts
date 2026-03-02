@@ -65,14 +65,6 @@ export interface RollCallRecord {
   createdAt: string;
 }
 
-// Lottery history type
-export interface LotteryRecord {
-  id: string;
-  prize: string;
-  studentId: string;
-  createdAt: string;
-}
-
 // Class info type
 export interface ClassInfo {
   name: string;
@@ -144,6 +136,5 @@ export interface ExportData {
   scoreRecords: ScoreRecord[];
   exchanges: Exchange[];
   rollCallHistory: RollCallRecord[];
-  lotteryHistory: LotteryRecord[];
   settings: Settings;
 }

@@ -42,7 +42,6 @@ type SyncData struct {
 	ScoreRecords    interface{} `json:"scoreRecords"`
 	Exchanges       interface{} `json:"exchanges"`
 	RollCallHistory interface{} `json:"rollCallHistory"`
-	LotteryHistory  interface{} `json:"lotteryHistory"`
 	Settings        interface{} `json:"settings"`
 }
 

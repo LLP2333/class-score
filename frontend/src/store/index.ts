@@ -28,7 +28,6 @@ export function exportAllData(): ExportData {
     scoreRecords: useRecordStore.getState().records,
     exchanges: useProductStore.getState().exchanges,
     rollCallHistory: useSettingsStore.getState().rollCallHistory,
-    lotteryHistory: useSettingsStore.getState().lotteryHistory,
     settings: useSettingsStore.getState().settings,
   };
 }
@@ -47,7 +46,6 @@ export function importAllData(data: ExportData): boolean {
     if (data.scoreRecords) useRecordStore.getState().setRecords(data.scoreRecords);
     if (data.exchanges) useProductStore.getState().setExchanges(data.exchanges);
     if (data.rollCallHistory) useSettingsStore.getState().setRollCallHistory(data.rollCallHistory);
-    if (data.lotteryHistory) useSettingsStore.getState().setLotteryHistory(data.lotteryHistory);
     if (data.settings) useSettingsStore.getState().setSettings(data.settings);
     
     return true;
