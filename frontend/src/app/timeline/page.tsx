@@ -131,7 +131,7 @@ export default function TimelinePage() {
                 {dayRecords.map((record) => {
                   const student = getStudentById(record.studentId);
                   const rule = record.ruleId ? getRuleById(record.ruleId) : null;
-                  const group = record.groupId ? getGroupById(record.groupId) : null;
+                  const group = student?.groupId ? getGroupById(student.groupId) : null;
                   
                   return (
                     <div key={record.id} className="relative">
