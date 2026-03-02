@@ -10,6 +10,7 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
 } from '@/components/ui/dropdown-menu';
+import { Input } from '@/components/ui/input';
 import { useRecordStore, useStudentStore, useRuleStore, useGroupStore } from '@/store';
 import { cn, getAvatarClass } from '@/lib/utils';
 import { EditRecordModal } from '@/components/features/EditRecordModal';
@@ -20,11 +21,12 @@ type FilterType = 'all' | 'add' | 'minus';
 
 export default function TimelinePage() {
   const { records, deleteRecord } = useRecordStore();
-  const { getStudentById, updateStudent } = useStudentStore();
+  const { students, getStudentById, updateStudent } = useStudentStore();
   const { getRuleById } = useRuleStore();
   const { getGroupById } = useGroupStore();
   
   const [filter, setFilter] = useState<FilterType>('all');
+  const [searchName, setSearchName] = useState('');
   const [editingRecord, setEditingRecord] = useState<ScoreRecord | null>(null);
 
   const handleDeleteRecord = (record: ScoreRecord) => {
@@ -39,10 +41,21 @@ export default function TimelinePage() {
     toast.success('记录已删除，总分已调整');
   };
 
-  // Filter and sort records
+  const matchedStudentIds = useMemo(() => {
+    const keyword = searchName.trim();
+    if (!keyword) return null;
+    return new Set(
+      students.filter(s => s.name.includes(keyword)).map(s => s.id)
+    );
+  }, [students, searchName]);
+
   const filteredRecords = useMemo(() => {
     let result = [...records];
     
+    if (matchedStudentIds) {
+      result = result.filter(r => matchedStudentIds.has(r.studentId));
+    }
+
     if (filter === 'add') {
       result = result.filter(r => r.score > 0);
     } else if (filter === 'minus') {
@@ -52,7 +65,7 @@ export default function TimelinePage() {
     return result.sort((a, b) => 
       new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
     );
-  }, [records, filter]);
+  }, [records, filter, matchedStudentIds]);
 
   // Group records by date
   const groupedRecords = useMemo(() => {
@@ -82,13 +95,21 @@ export default function TimelinePage() {
           积分时间线
         </h2>
         
-        <Tabs value={filter} onValueChange={(v) => setFilter(v as FilterType)}>
-          <TabsList>
-            <TabsTrigger value="all">全部</TabsTrigger>
-            <TabsTrigger value="add">加分</TabsTrigger>
-            <TabsTrigger value="minus">扣分</TabsTrigger>
-          </TabsList>
-        </Tabs>
+        <div className="flex items-center gap-3 flex-wrap">
+          <Input
+            placeholder="搜索学生姓名..."
+            value={searchName}
+            onChange={(e) => setSearchName(e.target.value)}
+            className="w-40 h-9"
+          />
+          <Tabs value={filter} onValueChange={(v) => setFilter(v as FilterType)}>
+            <TabsList>
+              <TabsTrigger value="all">全部</TabsTrigger>
+              <TabsTrigger value="add">加分</TabsTrigger>
+              <TabsTrigger value="minus">扣分</TabsTrigger>
+            </TabsList>
+          </Tabs>
+        </div>
       </div>
 
       {/* Timeline */}
@@ -202,9 +223,13 @@ export default function TimelinePage() {
         </div>
       ) : (
         <div className="flex flex-col items-center justify-center py-12 text-center">
-          <div className="text-6xl mb-4">📅</div>
-          <h3 className="text-lg font-medium mb-2">暂无积分记录</h3>
-          <p className="text-muted-foreground">开始为学生加减分后，记录会显示在这里</p>
+          <div className="text-6xl mb-4">{searchName ? '🔍' : '📅'}</div>
+          <h3 className="text-lg font-medium mb-2">
+            {searchName ? `未找到"${searchName}"的积分记录` : '暂无积分记录'}
+          </h3>
+          <p className="text-muted-foreground">
+            {searchName ? '请检查学生姓名是否正确' : '开始为学生加减分后，记录会显示在这里'}
+          </p>
         </div>
       )}
 
