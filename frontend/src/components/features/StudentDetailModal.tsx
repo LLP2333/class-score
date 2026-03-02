@@ -8,8 +8,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { cn, getAvatarClass, formatRelativeTime } from '@/lib/utils';
-import type { Student } from '@/types';
+import type { Student, ScoreRecord } from '@/types';
 import { useGroupStore, useStudentStore, useRecordStore, useRuleStore } from '@/store';
+import { EditRecordModal } from '@/components/features/EditRecordModal';
 import { toast } from 'sonner';
 
 interface StudentDetailModalProps {
@@ -19,16 +20,32 @@ interface StudentDetailModalProps {
   onUpdate?: () => void;
 }
 
-export function StudentDetailModal({ student, open, onClose, onUpdate }: StudentDetailModalProps) {
+export function StudentDetailModal({ student: studentProp, open, onClose, onUpdate }: StudentDetailModalProps) {
   const { groups, getGroupById } = useGroupStore();
-  const { updateStudent, deleteStudent } = useStudentStore();
-  const { getRecordsByStudentId, deleteRecordsByStudentId } = useRecordStore();
+  const { getStudentById, updateStudent, deleteStudent } = useStudentStore();
+  const { getRecordsByStudentId, deleteRecordsByStudentId, deleteRecord } = useRecordStore();
   const { getRuleById } = useRuleStore();
   
   const [isEditing, setIsEditing] = useState(false);
   const [editName, setEditName] = useState('');
   const [editGroupId, setEditGroupId] = useState('');
   const [editScore, setEditScore] = useState('');
+  const [editingRecord, setEditingRecord] = useState<ScoreRecord | null>(null);
+
+  const student = studentProp ? getStudentById(studentProp.id) ?? studentProp : null;
+
+  const handleDeleteRecord = (record: ScoreRecord) => {
+    if (!confirm('确定要删除这条积分记录吗？学生总分将自动调整。')) return;
+    const currentStudent = student ? getStudentById(student.id) : null;
+    deleteRecord(record.id);
+    if (currentStudent) {
+      updateStudent(currentStudent.id, {
+        totalScore: currentStudent.totalScore - record.score,
+      });
+    }
+    toast.success('记录已删除，总分已调整');
+    onUpdate?.();
+  };
 
   if (!student) return null;
 
@@ -157,15 +174,15 @@ export function StudentDetailModal({ student, open, onClose, onUpdate }: Student
                     return (
                       <div
                         key={record.id}
-                        className="flex items-center justify-between py-2 px-3 bg-muted/50 rounded-lg"
+                        className="group flex items-center justify-between py-2 px-3 bg-muted/50 rounded-lg"
                       >
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-2 min-w-0 flex-1">
                           <span>{rule?.icon || '📝'}</span>
-                          <span className="text-sm">
+                          <span className="text-sm truncate">
                             {record.reason || rule?.name || '积分变动'}
                           </span>
                         </div>
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-2 shrink-0">
                           <span
                             className={cn(
                               'font-semibold',
@@ -177,6 +194,26 @@ export function StudentDetailModal({ student, open, onClose, onUpdate }: Student
                           <span className="text-xs text-muted-foreground">
                             {formatRelativeTime(record.createdAt)}
                           </span>
+                          <div className="hidden group-hover:flex items-center gap-0.5">
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="h-6 w-6 p-0 text-xs"
+                              onClick={() => setEditingRecord(record)}
+                              title="编辑"
+                            >
+                              ✏️
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="h-6 w-6 p-0 text-xs"
+                              onClick={() => handleDeleteRecord(record)}
+                              title="删除"
+                            >
+                              🗑️
+                            </Button>
+                          </div>
                         </div>
                       </div>
                     );
@@ -195,6 +232,13 @@ export function StudentDetailModal({ student, open, onClose, onUpdate }: Student
           <Button onClick={onClose}>关闭</Button>
         </DialogFooter>
       </DialogContent>
+
+      <EditRecordModal
+        record={editingRecord}
+        open={!!editingRecord}
+        onClose={() => setEditingRecord(null)}
+        onSuccess={onUpdate}
+      />
     </Dialog>
   );
 }

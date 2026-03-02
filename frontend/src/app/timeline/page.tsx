@@ -3,18 +3,41 @@
 import { useMemo, useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Button } from '@/components/ui/button';
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+} from '@/components/ui/dropdown-menu';
 import { useRecordStore, useStudentStore, useRuleStore, useGroupStore } from '@/store';
 import { cn, getAvatarClass } from '@/lib/utils';
+import { EditRecordModal } from '@/components/features/EditRecordModal';
+import type { ScoreRecord } from '@/types';
+import { toast } from 'sonner';
 
 type FilterType = 'all' | 'add' | 'minus';
 
 export default function TimelinePage() {
-  const { records } = useRecordStore();
-  const { getStudentById } = useStudentStore();
+  const { records, deleteRecord } = useRecordStore();
+  const { getStudentById, updateStudent } = useStudentStore();
   const { getRuleById } = useRuleStore();
   const { getGroupById } = useGroupStore();
   
   const [filter, setFilter] = useState<FilterType>('all');
+  const [editingRecord, setEditingRecord] = useState<ScoreRecord | null>(null);
+
+  const handleDeleteRecord = (record: ScoreRecord) => {
+    if (!confirm('确定要删除这条积分记录吗？学生总分将自动调整。')) return;
+    const student = getStudentById(record.studentId);
+    deleteRecord(record.id);
+    if (student) {
+      updateStudent(student.id, {
+        totalScore: student.totalScore - record.score,
+      });
+    }
+    toast.success('记录已删除，总分已调整');
+  };
 
   // Filter and sort records
   const filteredRecords = useMemo(() => {
@@ -107,7 +130,7 @@ export default function TimelinePage() {
                             {student && (
                               <div
                                 className={cn(
-                                  'w-10 h-10 rounded-full flex items-center justify-center text-white font-semibold flex-shrink-0',
+                                  'w-10 h-10 rounded-full flex items-center justify-center text-white font-semibold shrink-0',
                                   getAvatarClass(student.avatar)
                                 )}
                               >
@@ -130,22 +153,42 @@ export default function TimelinePage() {
                               </div>
                             </div>
                             
-                            {/* Score and time */}
-                            <div className="text-right flex-shrink-0">
-                              <div
-                                className={cn(
-                                  'text-lg font-bold',
-                                  record.score > 0 ? 'text-green-600' : 'text-red-600'
-                                )}
-                              >
-                                {record.score > 0 ? '+' : ''}{record.score}
+                            {/* Score, time, and actions */}
+                            <div className="text-right shrink-0 flex items-start gap-2">
+                              <div>
+                                <div
+                                  className={cn(
+                                    'text-lg font-bold',
+                                    record.score > 0 ? 'text-green-600' : 'text-red-600'
+                                  )}
+                                >
+                                  {record.score > 0 ? '+' : ''}{record.score}
+                                </div>
+                                <div className="text-xs text-muted-foreground">
+                                  {new Date(record.createdAt).toLocaleTimeString('zh-CN', {
+                                    hour: '2-digit',
+                                    minute: '2-digit'
+                                  })}
+                                </div>
                               </div>
-                              <div className="text-xs text-muted-foreground">
-                                {new Date(record.createdAt).toLocaleTimeString('zh-CN', {
-                                  hour: '2-digit',
-                                  minute: '2-digit'
-                                })}
-                              </div>
+                              <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                  <Button variant="ghost" size="sm" className="h-7 w-7 p-0">
+                                    <span className="text-sm">⋮</span>
+                                  </Button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent align="end">
+                                  <DropdownMenuItem onClick={() => setEditingRecord(record)}>
+                                    ✏️ 编辑记录
+                                  </DropdownMenuItem>
+                                  <DropdownMenuItem
+                                    variant="destructive"
+                                    onClick={() => handleDeleteRecord(record)}
+                                  >
+                                    🗑️ 删除记录
+                                  </DropdownMenuItem>
+                                </DropdownMenuContent>
+                              </DropdownMenu>
                             </div>
                           </div>
                         </CardContent>
@@ -164,6 +207,12 @@ export default function TimelinePage() {
           <p className="text-muted-foreground">开始为学生加减分后，记录会显示在这里</p>
         </div>
       )}
+
+      <EditRecordModal
+        record={editingRecord}
+        open={!!editingRecord}
+        onClose={() => setEditingRecord(null)}
+      />
     </div>
   );
 }

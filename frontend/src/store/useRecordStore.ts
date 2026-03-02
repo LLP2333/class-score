@@ -8,6 +8,9 @@ interface RecordStore {
   
   // Actions
   addRecord: (data: Omit<ScoreRecord, 'id' | 'createdAt'>) => ScoreRecord;
+  updateRecord: (id: string, updates: Partial<Pick<ScoreRecord, 'score' | 'reason' | 'ruleId'>>) => ScoreRecord | null;
+  deleteRecord: (id: string) => ScoreRecord | null;
+  getRecordById: (id: string) => ScoreRecord | undefined;
   getRecordsByStudentId: (studentId: string) => ScoreRecord[];
   getRecordsByGroupId: (groupId: string) => ScoreRecord[];
   getRecentRecords: (limit?: number) => ScoreRecord[];
@@ -34,7 +37,32 @@ export const useRecordStore = create<RecordStore>()(
         set((state) => ({ records: [...state.records, newRecord] }));
         return newRecord;
       },
-      
+
+      updateRecord: (id, updates) => {
+        const records = get().records;
+        const index = records.findIndex(r => r.id === id);
+        if (index === -1) return null;
+
+        const updatedRecord = { ...records[index], ...updates };
+        const newRecords = [...records];
+        newRecords[index] = updatedRecord;
+        set({ records: newRecords });
+        return updatedRecord;
+      },
+
+      deleteRecord: (id) => {
+        const record = get().records.find(r => r.id === id);
+        if (!record) return null;
+        set((state) => ({
+          records: state.records.filter(r => r.id !== id)
+        }));
+        return record;
+      },
+
+      getRecordById: (id) => {
+        return get().records.find(r => r.id === id);
+      },
+
       getRecordsByStudentId: (studentId) => {
         return get().records
           .filter(r => r.studentId === studentId)
