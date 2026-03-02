@@ -26,7 +26,7 @@ export function Header({ onMenuClick, onRefresh }: HeaderProps) {
   const title = pageTitles[pathname] || '首页';
 
   return (
-    <header className="sticky top-0 z-30 h-16 bg-card border-b border-border flex items-center justify-between px-4">
+    <header className="h-16 bg-card border-b border-border flex items-center justify-between px-4 shrink-0">
       <div className="flex items-center gap-4">
         <Button
           variant="ghost"

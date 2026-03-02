@@ -118,7 +118,7 @@ export default function TimelinePage() {
           {Object.entries(groupedRecords).map(([date, dayRecords]) => (
             <div key={date}>
               {/* Date header */}
-              <div className="sticky top-16 z-10 bg-background py-2">
+              <div className="sticky top-0 z-10 bg-background py-2">
                 <div className="inline-flex items-center gap-2 px-3 py-1 bg-muted rounded-full text-sm font-medium">
                   <span>📆</span>
                   {date}
