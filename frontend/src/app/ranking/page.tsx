@@ -1,47 +1,160 @@
 'use client';
 
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { Card, CardContent } from '@/components/ui/card';
-import { useStudentStore, useGroupStore } from '@/store';
+import { useStudentStore, useGroupStore, useRecordStore } from '@/store';
 import { cn, getAvatarClass } from '@/lib/utils';
+
+type TimePeriod = 'all' | 'week' | 'month' | 'custom';
+
+interface DateRange {
+  start: Date | null;
+  end: Date | null;
+}
 
 const groupColors = [
   '#EF4444', '#F59E0B', '#10B981', '#3B82F6',
   '#8B5CF6', '#EC4899', '#14B8A6', '#F97316'
 ];
 
+function getPresetDateRange(period: Exclude<TimePeriod, 'custom'>): DateRange {
+  if (period === 'all') return { start: null, end: null };
+  const now = new Date();
+  const todayEnd = new Date(now);
+  todayEnd.setHours(23, 59, 59, 999);
+  if (period === 'week') {
+    const day = now.getDay();
+    const diff = day === 0 ? 6 : day - 1;
+    const monday = new Date(now);
+    monday.setDate(now.getDate() - diff);
+    monday.setHours(0, 0, 0, 0);
+    return { start: monday, end: todayEnd };
+  }
+  return { start: new Date(now.getFullYear(), now.getMonth(), 1), end: todayEnd };
+}
+
+function formatDate(d: Date): string {
+  return `${d.getFullYear()}/${d.getMonth() + 1}/${d.getDate()}`;
+}
+
+function toDateInputValue(d: Date): string {
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${y}-${m}-${day}`;
+}
+
 export default function RankingPage() {
   const { students } = useStudentStore();
   const { groups } = useGroupStore();
+  const { records } = useRecordStore();
+  const [timePeriod, setTimePeriod] = useState<TimePeriod>('all');
+  const [customStart, setCustomStart] = useState(() => toDateInputValue(new Date()));
+  const [customEnd, setCustomEnd] = useState(() => toDateInputValue(new Date()));
 
-  // Student ranking
-  const sortedStudents = useMemo(() => 
-    [...students].sort((a, b) => b.totalScore - a.totalScore),
-    [students]
+  const activeDateRange = useMemo<DateRange>(() => {
+    if (timePeriod === 'custom') {
+      const s = new Date(customStart);
+      s.setHours(0, 0, 0, 0);
+      const e = new Date(customEnd);
+      e.setHours(23, 59, 59, 999);
+      return { start: s, end: e };
+    }
+    return getPresetDateRange(timePeriod);
+  }, [timePeriod, customStart, customEnd]);
+
+  const rangeLabel = useMemo(() => {
+    if (!activeDateRange.start || !activeDateRange.end) return '全部时间';
+    return `${formatDate(activeDateRange.start)} ~ ${formatDate(activeDateRange.end)}`;
+  }, [activeDateRange]);
+
+  const studentScoreMap = useMemo(() => {
+    const { start, end } = activeDateRange;
+    if (!start) {
+      return new Map(students.map(s => [s.id, s.totalScore]));
+    }
+    const map = new Map<string, number>();
+    students.forEach(s => map.set(s.id, 0));
+    records.forEach(r => {
+      const t = new Date(r.createdAt);
+      if (t >= start && (!end || t <= end) && map.has(r.studentId)) {
+        map.set(r.studentId, (map.get(r.studentId) || 0) + r.score);
+      }
+    });
+    return map;
+  }, [students, records, activeDateRange]);
+
+  const sortedStudents = useMemo(() =>
+    [...students]
+      .map(s => ({ ...s, displayScore: studentScoreMap.get(s.id) || 0 }))
+      .sort((a, b) => b.displayScore - a.displayScore),
+    [students, studentScoreMap]
   );
 
   const top3Students = sortedStudents.slice(0, 3);
   const restStudents = sortedStudents.slice(3);
 
-  // Group ranking
   const groupsWithScore = useMemo(() => {
     return groups.map(g => {
       const members = students.filter(s => s.groupId === g.id);
-      const totalScore = members.reduce((sum, m) => sum + m.totalScore, 0);
+      const totalScore = members.reduce((sum, m) => sum + (studentScoreMap.get(m.id) || 0), 0);
       return {
         ...g,
         totalScore,
         memberCount: members.length,
       };
     }).sort((a, b) => b.totalScore - a.totalScore);
-  }, [groups, students]);
+  }, [groups, students, studentScoreMap]);
 
   return (
     <div className="animate-fade-in space-y-6">
       <div className="flex items-center gap-2">
         <span className="text-2xl">🏆</span>
         <h2 className="text-lg font-semibold">排行榜</h2>
+      </div>
+
+      <div className="space-y-3">
+        <div className="flex flex-wrap gap-2">
+          {([['all', '全部'], ['week', '本周'], ['month', '本月'], ['custom', '自定义']] as const).map(([key, label]) => (
+            <button
+              key={key}
+              onClick={() => setTimePeriod(key)}
+              className={cn(
+                'px-4 py-1.5 rounded-full text-sm font-medium transition-colors',
+                timePeriod === key
+                  ? 'bg-primary text-primary-foreground shadow-sm'
+                  : 'bg-muted text-muted-foreground hover:bg-muted/80'
+              )}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
+
+        {timePeriod === 'custom' && (
+          <div className="flex flex-wrap items-center gap-2">
+            <input
+              type="date"
+              value={customStart}
+              onChange={e => setCustomStart(e.target.value)}
+              className="rounded-md border border-input bg-background px-3 py-1.5 text-sm shadow-sm"
+            />
+            <span className="text-muted-foreground text-sm">至</span>
+            <input
+              type="date"
+              value={customEnd}
+              onChange={e => setCustomEnd(e.target.value)}
+              min={customStart}
+              className="rounded-md border border-input bg-background px-3 py-1.5 text-sm shadow-sm"
+            />
+          </div>
+        )}
+
+        <div className="text-xs text-muted-foreground flex items-center gap-1.5">
+          <span>📅</span>
+          <span>统计范围：{rangeLabel}</span>
+        </div>
       </div>
 
       <Tabs defaultValue="student">
@@ -74,7 +187,7 @@ export default function RankingPage() {
                       {top3Students[1].name.charAt(0)}
                     </div>
                     <div className="font-semibold">{top3Students[1].name}</div>
-                    <div className="text-xl font-bold text-primary">{top3Students[1].totalScore}分</div>
+                    <div className="text-xl font-bold text-primary">{top3Students[1].displayScore}分</div>
                     <div className="bg-gradient-to-br from-gray-300 to-gray-400 text-white px-6 py-2 rounded-t-lg mt-2">
                       🥈 第2名
                     </div>
@@ -94,7 +207,7 @@ export default function RankingPage() {
                       {top3Students[0].name.charAt(0)}
                     </div>
                     <div className="font-semibold text-lg">{top3Students[0].name}</div>
-                    <div className="text-2xl font-bold text-primary">{top3Students[0].totalScore}分</div>
+                    <div className="text-2xl font-bold text-primary">{top3Students[0].displayScore}分</div>
                     <div className="bg-gradient-to-br from-yellow-400 to-orange-500 text-white px-8 py-3 rounded-t-lg mt-2">
                       🥇 第1名
                     </div>
@@ -114,7 +227,7 @@ export default function RankingPage() {
                       {top3Students[2].name.charAt(0)}
                     </div>
                     <div className="font-semibold">{top3Students[2].name}</div>
-                    <div className="text-lg font-bold text-primary">{top3Students[2].totalScore}分</div>
+                    <div className="text-lg font-bold text-primary">{top3Students[2].displayScore}分</div>
                     <div className="bg-gradient-to-br from-amber-600 to-amber-700 text-white px-5 py-1.5 rounded-t-lg mt-2">
                       🥉 第3名
                     </div>
@@ -143,7 +256,7 @@ export default function RankingPage() {
                           {student.name.charAt(0)}
                         </div>
                         <div className="flex-1 font-medium">{student.name}</div>
-                        <div className="font-bold text-primary">{student.totalScore}分</div>
+                        <div className="font-bold text-primary">{student.displayScore}分</div>
                       </div>
                     ))}
                   </CardContent>
