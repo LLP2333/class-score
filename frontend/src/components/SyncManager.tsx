@@ -57,7 +57,7 @@ export function SyncManager() {
       } else if (hasRemoteData) {
         setFirstSyncOpen(true);
       }
-    }, 2000);
+    }, 500);
 
     return () => clearTimeout(timer);
   }, [isAvailable, isLoggedIn, lastSyncVersion, hasRemoteData, runSyncCheck]);
