@@ -3,6 +3,7 @@
 import { useState, useCallback } from 'react';
 import { Sidebar } from './Sidebar';
 import { Header } from './Header';
+import { SyncManager } from '@/components/SyncManager';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 
@@ -30,6 +31,7 @@ export function AppLayout({ children }: AppLayoutProps) {
   return (
     <div className="h-dvh bg-background overflow-hidden">
       <Sidebar isOpen={sidebarOpen} onClose={handleSidebarClose} />
+      <SyncManager />
       
       <div className="md:pl-60 h-full flex flex-col">
         <Header onMenuClick={handleMenuClick} onRefresh={handleRefresh} />

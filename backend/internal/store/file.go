@@ -5,11 +5,18 @@ import (
 	"errors"
 	"os"
 	"path/filepath"
+	"time"
 )
 
 var (
 	ErrDataNotFound = errors.New("用户数据不存在")
 )
+
+// SyncMeta 同步元数据（版本号+最后修改时间）
+type SyncMeta struct {
+	Version        int       `json:"version"`
+	LastModifiedAt time.Time `json:"last_modified_at"`
+}
 
 // FileStore 文件存储
 type FileStore struct {
@@ -113,4 +120,50 @@ func (f *FileStore) GetUserDataInfo(username string) (map[string]interface{}, er
 		"modified":  info.ModTime(),
 		"file_path": filePath,
 	}, nil
+}
+
+// getMetaPath 获取用户同步元数据文件路径
+func (f *FileStore) getMetaPath(username string) string {
+	safeName := sanitizeFilename(username)
+	return filepath.Join(f.basePath, safeName+".meta.json")
+}
+
+// LoadSyncMeta 读取用户同步元数据
+func (f *FileStore) LoadSyncMeta(username string) (*SyncMeta, error) {
+	metaPath := f.getMetaPath(username)
+
+	data, err := os.ReadFile(metaPath)
+	if err != nil {
+		if os.IsNotExist(err) {
+			return &SyncMeta{Version: 0}, nil
+		}
+		return nil, err
+	}
+
+	var meta SyncMeta
+	if err := json.Unmarshal(data, &meta); err != nil {
+		return &SyncMeta{Version: 0}, nil
+	}
+	return &meta, nil
+}
+
+// IncrementSyncVersion 递增版本号并保存
+func (f *FileStore) IncrementSyncVersion(username string) (*SyncMeta, error) {
+	current, err := f.LoadSyncMeta(username)
+	if err != nil {
+		current = &SyncMeta{Version: 0}
+	}
+
+	current.Version++
+	current.LastModifiedAt = time.Now()
+
+	data, err := json.MarshalIndent(current, "", "  ")
+	if err != nil {
+		return nil, err
+	}
+
+	if err := os.WriteFile(f.getMetaPath(username), data, 0644); err != nil {
+		return nil, err
+	}
+	return current, nil
 }

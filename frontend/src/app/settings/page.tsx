@@ -6,17 +6,19 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { useSettingsStore, useStudentStore, exportAllData, importAllData, clearAllData } from '@/store';
+import { useSettingsStore, useStudentStore, useSyncStore, exportAllData, importAllData, clearAllData } from '@/store';
 import { useBackend } from '@/hooks/useBackend';
 import { toast } from 'sonner';
 import * as XLSX from 'xlsx';
-import { Download, Upload, Trash2, Cloud, CloudOff, LogIn, LogOut } from 'lucide-react';
+import { Download, Upload, Trash2, Cloud, CloudOff, LogIn, LogOut, RefreshCw } from 'lucide-react';
+import { formatRelativeTime } from '@/lib/utils';
 
 export default function SettingsPage() {
   const { classInfo, setClassInfo } = useSettingsStore();
   const { addStudent } = useStudentStore();
   
-  const { isAvailable, isLoggedIn, user, isLoading, login, logout, register, uploadData, downloadData } = useBackend();
+  const { isAvailable, isLoggedIn, user, isDirty, isLoading, login, logout, register, uploadData, downloadData, checkSyncStatus } = useBackend();
+  const lastSyncAt = useSyncStore((s) => s.lastSyncAt);
 
   // Modal states
   const [loginModalOpen, setLoginModalOpen] = useState(false);
@@ -208,20 +210,65 @@ export default function SettingsPage() {
             {isAvailable ? (
               <>
                 {isLoggedIn ? (
-                  <div className="flex flex-wrap gap-2">
-                    <Button onClick={uploadData} disabled={isLoading}>
-                      <Upload className="h-4 w-4 mr-1" />
-                      上传到云端
-                    </Button>
-                    <Button variant="outline" onClick={downloadData} disabled={isLoading}>
-                      <Download className="h-4 w-4 mr-1" />
-                      从云端下载
-                    </Button>
-                    <Button variant="ghost" onClick={logout}>
-                      <LogOut className="h-4 w-4 mr-1" />
-                      退出登录
-                    </Button>
-                  </div>
+                  <>
+                    {/* Sync status */}
+                    <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-muted-foreground">
+                      <span className="flex items-center gap-1">
+                        {isDirty ? (
+                          <span className="inline-block h-2 w-2 rounded-full bg-amber-500" />
+                        ) : (
+                          <span className="inline-block h-2 w-2 rounded-full bg-green-500" />
+                        )}
+                        {isDirty ? '本地有未同步的修改' : '数据已同步'}
+                      </span>
+                      {lastSyncAt && (
+                        <span>上次同步：{formatRelativeTime(lastSyncAt)}</span>
+                      )}
+                    </div>
+
+                    <div className="flex flex-wrap gap-2">
+                      <Button onClick={async () => {
+                        if (lastSyncAt) {
+                          const { action } = await checkSyncStatus();
+                          if (action === 'conflict') {
+                            if (!confirm('云端数据已被其他设备更新，确定要用本地数据覆盖云端吗？')) return;
+                          }
+                          if (action === 'download') {
+                            toast.info('云端数据比本地更新，建议先下载');
+                            return;
+                          }
+                        }
+                        await uploadData();
+                      }} disabled={isLoading}>
+                        <Upload className="h-4 w-4 mr-1" />
+                        上传到云端
+                      </Button>
+                      <Button variant="outline" onClick={async () => {
+                        if (isDirty) {
+                          if (!confirm('本地有未同步的修改，下载云端数据会覆盖这些修改。\n\n确定要继续吗？')) return;
+                        }
+                        await downloadData();
+                      }} disabled={isLoading}>
+                        <Download className="h-4 w-4 mr-1" />
+                        从云端下载
+                      </Button>
+                      <Button variant="outline" onClick={() => checkSyncStatus().then(({ action }) => {
+                        if (action === 'none') toast.info('数据已是最新');
+                      })} disabled={isLoading}>
+                        <RefreshCw className="h-4 w-4 mr-1" />
+                        检查同步
+                      </Button>
+                      <Button variant="ghost" onClick={() => {
+                        if (isDirty) {
+                          if (!confirm('本地有未同步的修改，退出后这些修改不会自动上传。\n\n确定要退出登录吗？')) return;
+                        }
+                        logout();
+                      }}>
+                        <LogOut className="h-4 w-4 mr-1" />
+                        退出登录
+                      </Button>
+                    </div>
+                  </>
                 ) : (
                   <Button onClick={() => setLoginModalOpen(true)}>
                     <LogIn className="h-4 w-4 mr-1" />

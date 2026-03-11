@@ -5,7 +5,7 @@
     "teacher": "班主任"
   },
   "exchanges": [],
-  "exportedAt": "2026-02-26T01:05:36.087Z",
+  "exportedAt": "2026-03-11T02:21:45.427Z",
   "groups": [
     {
       "color": 3,
@@ -100,7 +100,6 @@
       "name": "第十五组"
     }
   ],
-  "lotteryHistory": [],
   "products": [
     {
       "exchangeCount": 0,
@@ -817,6 +816,33 @@
       "reason": "小组加分",
       "score": 10,
       "studentId": "ml4ohmxwvk419kn51"
+    },
+    {
+      "createdAt": "2026-03-10T04:36:05.491Z",
+      "groupId": "ml4om3h57d60f1fru",
+      "id": "mmk4arcjyle49vnz4",
+      "reason": "加分",
+      "ruleId": "ml4o6s41vwiukahad",
+      "score": 2,
+      "studentId": "ml4ohmxw9vuetfw66"
+    },
+    {
+      "createdAt": "2026-03-11T02:20:38.381Z",
+      "groupId": "ml4om3h57d60f1fru",
+      "id": "mmlewf3hee0m9ub5y",
+      "reason": "加分",
+      "ruleId": "ml4o6s41vwiukahad",
+      "score": 2,
+      "studentId": "ml4ohmxw9vuetfw66"
+    },
+    {
+      "createdAt": "2026-03-11T02:21:40.323Z",
+      "groupId": "ml4om3h57d60f1fru",
+      "id": "mmlexqw34806vdpdq",
+      "reason": "加分",
+      "ruleId": "ml4o6s41vwiukahad",
+      "score": 2,
+      "studentId": "ml4ohmxw9vuetfw66"
     }
   ],
   "settings": {
@@ -831,7 +857,7 @@
       "groupId": "ml4om3h57d60f1fru",
       "id": "ml4ohmxw9vuetfw66",
       "name": "王妤欢",
-      "totalScore": 15
+      "totalScore": 21
     },
     {
       "avatar": 7,
@@ -1266,7 +1292,7 @@
       "totalScore": 4
     }
   ],
-  "syncedAt": "2026-02-26T09:05:36+08:00",
+  "syncedAt": "2026-03-11T10:21:45+08:00",
   "syncedBy": "llp",
   "version": "1.0"
 }

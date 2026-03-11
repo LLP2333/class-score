@@ -6,6 +6,7 @@ export { useRecordStore } from './useRecordStore';
 export { useProductStore } from './useProductStore';
 export { useSettingsStore } from './useSettingsStore';
 export { useAuthStore } from './useAuthStore';
+export { useSyncStore, setSyncing } from './useSyncStore';
 
 // Combined data export/import utilities
 import { useStudentStore } from './useStudentStore';
@@ -14,6 +15,7 @@ import { useRuleStore } from './useRuleStore';
 import { useRecordStore } from './useRecordStore';
 import { useProductStore } from './useProductStore';
 import { useSettingsStore } from './useSettingsStore';
+import { setSyncing } from './useSyncStore';
 import type { ExportData } from '@/types';
 
 export function exportAllData(): ExportData {
@@ -32,11 +34,18 @@ export function exportAllData(): ExportData {
   };
 }
 
-export function importAllData(data: ExportData): boolean {
+/**
+ * Import data into all stores.
+ * When `fromSync` is true, dirty tracking is suppressed so the import
+ * doesn't mark local data as modified.
+ */
+export function importAllData(data: ExportData, fromSync = false): boolean {
   try {
     if (!data.version) {
       throw new Error('Invalid backup file');
     }
+
+    if (fromSync) setSyncing(true);
     
     if (data.classInfo) useSettingsStore.getState().setClassInfo(data.classInfo);
     if (data.students) useStudentStore.getState().setStudents(data.students);
@@ -47,9 +56,12 @@ export function importAllData(data: ExportData): boolean {
     if (data.exchanges) useProductStore.getState().setExchanges(data.exchanges);
     if (data.rollCallHistory) useSettingsStore.getState().setRollCallHistory(data.rollCallHistory);
     if (data.settings) useSettingsStore.getState().setSettings(data.settings);
+
+    if (fromSync) setSyncing(false);
     
     return true;
   } catch (e) {
+    if (fromSync) setSyncing(false);
     console.error('Import error:', e);
     return false;
   }

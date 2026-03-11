@@ -1,4 +1,4 @@
-import type { ApiResponse, LoginResponse, RegisterResponse, ExportData } from '@/types';
+import type { ApiResponse, LoginResponse, RegisterResponse, SyncMetaResponse, SyncUploadResponse, ExportData } from '@/types';
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8000';
 const TIMEOUT = 3000;
@@ -119,11 +119,34 @@ export const api = {
     }
   },
   
+  // Get sync metadata (version + last modified time)
+  async syncMeta(token: string): Promise<ApiResponse<SyncMetaResponse>> {
+    try {
+      const response = await fetchWithTimeout(`${API_BASE}/api/sync/meta`, {
+        headers: { 'Authorization': `Bearer ${token}` },
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        return { success: true, data: result.data };
+      }
+
+      if (response.status === 401) {
+        return { success: false, error: 'Token已过期，请重新登录' };
+      }
+
+      return { success: false, error: result.error || '获取同步信息失败' };
+    } catch {
+      return { success: false, error: '网络错误' };
+    }
+  },
+
   // Upload data to backend
   async uploadData(
     token: string,
     data: ExportData
-  ): Promise<ApiResponse<{ size: number }>> {
+  ): Promise<ApiResponse<SyncUploadResponse>> {
     try {
       const response = await fetch(`${API_BASE}/api/sync/upload`, {
         method: 'POST',
@@ -144,7 +167,6 @@ export const api = {
         };
       }
       
-      // Handle token expiration
       if (response.status === 401) {
         return {
           success: false,

@@ -124,6 +124,16 @@ export interface RegisterResponse {
   username: string;
 }
 
+export interface SyncMetaResponse {
+  version: number;
+  last_modified_at: string;
+}
+
+export interface SyncUploadResponse {
+  version: number;
+  last_modified_at: string;
+}
+
 // Export data type (for backup/sync)
 export interface ExportData {
   version: string;

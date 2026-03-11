@@ -2,11 +2,14 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import { api } from '@/lib/api';
-import { useAuthStore, exportAllData, importAllData } from '@/store';
+import { useAuthStore, useSyncStore, exportAllData, importAllData, setSyncing } from '@/store';
 import { toast } from 'sonner';
+
+export type SyncAction = 'none' | 'upload' | 'download' | 'conflict';
 
 export function useBackend() {
   const { isAvailable, token, user, hasRemoteData, setAvailable, setAuth, clearAuth, setHasRemoteData, isLoggedIn } = useAuthStore();
+  const { lastSyncVersion, isDirty, markClean } = useSyncStore();
   const [isChecking, setIsChecking] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -22,7 +25,6 @@ export function useBackend() {
     }
   }, [setAvailable]);
 
-  // Initialize backend on mount
   useEffect(() => {
     checkBackend();
   }, [checkBackend]);
@@ -80,8 +82,48 @@ export function useBackend() {
   // Logout
   const logout = useCallback(() => {
     clearAuth();
+    useSyncStore.getState().reset();
     toast.success('已退出登录');
   }, [clearAuth]);
+
+  // Check sync status: compare local dirty flag + versions to decide action
+  const checkSyncStatus = useCallback(async (): Promise<{ action: SyncAction; serverVersion: number; serverModifiedAt: string }> => {
+    const fallback = { action: 'none' as SyncAction, serverVersion: 0, serverModifiedAt: '' };
+
+    if (!isLoggedIn() || !token) return fallback;
+
+    try {
+      const result = await api.syncMeta(token);
+      if (!result.success || !result.data) {
+        if (result.error?.includes('Token')) clearAuth();
+        return fallback;
+      }
+
+      const serverVersion = result.data.version;
+      const serverModifiedAt = result.data.last_modified_at;
+      const localVersion = useSyncStore.getState().lastSyncVersion;
+      const localDirty = useSyncStore.getState().isDirty;
+
+      let action: SyncAction = 'none';
+
+      if (!localDirty && serverVersion === localVersion) {
+        action = 'none';
+      } else if (!localDirty && serverVersion > localVersion) {
+        action = 'download';
+      } else if (localDirty && serverVersion === localVersion) {
+        action = 'upload';
+      } else if (localDirty && serverVersion > localVersion) {
+        action = 'conflict';
+      } else if (!localDirty && serverVersion < localVersion) {
+        // Shouldn't happen normally — local version ahead without dirty flag
+        action = 'none';
+      }
+
+      return { action, serverVersion, serverModifiedAt };
+    } catch {
+      return fallback;
+    }
+  }, [isLoggedIn, token, clearAuth]);
 
   // Upload data to backend
   const uploadData = useCallback(async () => {
@@ -92,24 +134,26 @@ export function useBackend() {
 
     setIsLoading(true);
     try {
+      setSyncing(true);
       const data = exportAllData();
       const result = await api.uploadData(token, data);
-      
-      if (result.success) {
+      setSyncing(false);
+
+      if (result.success && result.data) {
         setHasRemoteData(true);
-        toast.success('数据上传成功');
+        markClean(result.data.version);
+        toast.success('数据已同步到云端');
         return true;
       } else {
-        if (result.error?.includes('Token')) {
-          clearAuth();
-        }
+        if (result.error?.includes('Token')) clearAuth();
         toast.error(result.error || '上传失败');
         return false;
       }
     } finally {
+      setSyncing(false);
       setIsLoading(false);
     }
-  }, [isLoggedIn, token, setHasRemoteData, clearAuth]);
+  }, [isLoggedIn, token, setHasRemoteData, markClean, clearAuth]);
 
   // Download data from backend
   const downloadData = useCallback(async () => {
@@ -120,33 +164,36 @@ export function useBackend() {
 
     setIsLoading(true);
     try {
+      // First get the meta to know the version
+      const metaResult = await api.syncMeta(token);
+      const serverVersion = metaResult.success && metaResult.data ? metaResult.data.version : 0;
+
       const result = await api.downloadData(token);
-      
+
       if (result.success) {
         if (result.data) {
-          const success = importAllData(result.data);
+          const success = importAllData(result.data, true);
           if (success) {
-            toast.success('数据下载成功');
+            markClean(serverVersion);
+            toast.success('已从云端同步数据');
             return true;
           } else {
             toast.error('数据导入失败');
             return false;
           }
         } else {
-          toast.info('后端暂无数据');
+          toast.info('云端暂无数据');
           return true;
         }
       } else {
-        if (result.error?.includes('Token')) {
-          clearAuth();
-        }
+        if (result.error?.includes('Token')) clearAuth();
         toast.error(result.error || '下载失败');
         return false;
       }
     } finally {
       setIsLoading(false);
     }
-  }, [isLoggedIn, token, clearAuth]);
+  }, [isLoggedIn, token, markClean, clearAuth]);
 
   return {
     // State
@@ -154,14 +201,17 @@ export function useBackend() {
     isLoggedIn: isLoggedIn(),
     user,
     hasRemoteData,
+    isDirty,
+    lastSyncVersion,
     isChecking,
     isLoading,
-    
+
     // Actions
     checkBackend,
     register,
     login,
     logout,
+    checkSyncStatus,
     uploadData,
     downloadData,
   };
