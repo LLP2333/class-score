@@ -62,16 +62,41 @@ export function SyncManager() {
     return () => clearTimeout(timer);
   }, [isAvailable, isLoggedIn, lastSyncVersion, hasRemoteData, runSyncCheck]);
 
-  // Re-check when tab becomes visible
+  // Poll server every 5s for changes from other devices (pauses when tab is hidden)
   useEffect(() => {
-    const handleVisibility = () => {
-      if (document.visibilityState === 'visible' && canAutoSync) {
-        runSyncCheck();
+    if (!canAutoSync) return;
+
+    let intervalId: ReturnType<typeof setInterval> | null = null;
+
+    const start = () => {
+      if (!intervalId) {
+        intervalId = setInterval(runSyncCheck, 5000);
       }
     };
 
+    const stop = () => {
+      if (intervalId) {
+        clearInterval(intervalId);
+        intervalId = null;
+      }
+    };
+
+    const handleVisibility = () => {
+      if (document.visibilityState === 'visible') {
+        runSyncCheck();
+        start();
+      } else {
+        stop();
+      }
+    };
+
+    if (document.visibilityState === 'visible') start();
     document.addEventListener('visibilitychange', handleVisibility);
-    return () => document.removeEventListener('visibilitychange', handleVisibility);
+
+    return () => {
+      stop();
+      document.removeEventListener('visibilitychange', handleVisibility);
+    };
   }, [canAutoSync, runSyncCheck]);
 
   // Debounced auto-upload on data change

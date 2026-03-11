@@ -5,7 +5,7 @@
     "teacher": "班主任"
   },
   "exchanges": [],
-  "exportedAt": "2026-03-11T02:21:45.427Z",
+  "exportedAt": "2026-03-11T02:28:16.315Z",
   "groups": [
     {
       "color": 3,
@@ -843,6 +843,24 @@
       "ruleId": "ml4o6s41vwiukahad",
       "score": 2,
       "studentId": "ml4ohmxw9vuetfw66"
+    },
+    {
+      "createdAt": "2026-03-11T02:26:16.203Z",
+      "groupId": "ml4om3h57d60f1fru",
+      "id": "mmlf3nrfggcg3ye9m",
+      "reason": "扣分",
+      "ruleId": "ml4o6s41j926p7fx9",
+      "score": -2,
+      "studentId": "ml4ohmxw9vuetfw66"
+    },
+    {
+      "createdAt": "2026-03-11T02:28:11.287Z",
+      "groupId": "ml4om3h57d60f1fru",
+      "id": "mmlf64k7ebruknh5s",
+      "reason": "扣分",
+      "ruleId": "ml4o6s41dv0t3f95u",
+      "score": -2,
+      "studentId": "ml4ohmxw9vuetfw66"
     }
   ],
   "settings": {
@@ -857,7 +875,7 @@
       "groupId": "ml4om3h57d60f1fru",
       "id": "ml4ohmxw9vuetfw66",
       "name": "王妤欢",
-      "totalScore": 21
+      "totalScore": 17
     },
     {
       "avatar": 7,
@@ -1292,7 +1310,7 @@
       "totalScore": 4
     }
   ],
-  "syncedAt": "2026-03-11T10:21:45+08:00",
+  "syncedAt": "2026-03-11T10:28:16+08:00",
   "syncedBy": "llp",
   "version": "1.0"
 }
