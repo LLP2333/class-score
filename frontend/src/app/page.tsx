@@ -116,15 +116,15 @@ export default function HomePage() {
 
       {/* Group Filter */}
       <Tabs value={activeGroupId} onValueChange={setActiveGroupId}>
-        <TabsList className="w-full justify-start flex-wrap h-auto gap-1 bg-transparent p-0">
-          <TabsTrigger value="all" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+        <TabsList className="w-full justify-start flex-wrap h-auto group-data-[orientation=horizontal]/tabs:h-auto gap-1 bg-transparent p-0">
+          <TabsTrigger value="all" className="flex-none data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
             全部
           </TabsTrigger>
           {groups.map((group) => (
             <TabsTrigger
               key={group.id}
               value={group.id}
-              className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+              className="flex-none data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
             >
               {group.name}
             </TabsTrigger>
