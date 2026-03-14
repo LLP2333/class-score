@@ -4,20 +4,29 @@ import { useEffect, useRef, useState, useCallback } from 'react';
 import { useBackend } from '@/hooks/useBackend';
 import { useSyncStore } from '@/store';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
-import { Cloud, Monitor, Upload, Download, X } from 'lucide-react';
+import { Cloud, Monitor, Upload, Download, X, LogIn } from 'lucide-react';
 import { formatDate } from '@/lib/utils';
+import { toast } from 'sonner';
 
 const AUTO_UPLOAD_DELAY = 5000;
 
+const LOGIN_PROMPT_KEY = 'classScore_loginPromptDismissed';
+
 export function SyncManager() {
-  const { isAvailable, isLoggedIn, hasRemoteData, isLoading, checkSyncStatus, uploadData, downloadData } = useBackend();
+  const { isAvailable, isLoggedIn, hasRemoteData, isLoading, isChecking, checkSyncStatus, uploadData, downloadData, login, register } = useBackend();
   const isDirty = useSyncStore((s) => s.isDirty);
   const lastSyncAt = useSyncStore((s) => s.lastSyncAt);
   const lastSyncVersion = useSyncStore((s) => s.lastSyncVersion);
 
   const [conflictOpen, setConflictOpen] = useState(false);
   const [firstSyncOpen, setFirstSyncOpen] = useState(false);
+  const [loginPromptOpen, setLoginPromptOpen] = useState(false);
+  const [isRegistering, setIsRegistering] = useState(false);
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
   const [serverModifiedAt, setServerModifiedAt] = useState('');
   const hasChecked = useRef(false);
   const debounceTimer = useRef<ReturnType<typeof setTimeout>>(null);
@@ -44,23 +53,31 @@ export function SyncManager() {
     }
   }, [isAvailable, isLoggedIn, lastSyncVersion, checkSyncStatus, uploadData, downloadData]);
 
-  // --- First-time users (lastSyncVersion === 0): show guidance dialog ---
+  // --- On mount: login prompt for unauthenticated users, sync check for authenticated ---
   useEffect(() => {
     if (hasChecked.current) return;
-    if (!isAvailable || !isLoggedIn) return;
+    if (isChecking) return; // wait for health check to finish
+    if (!isAvailable) return;
 
     hasChecked.current = true;
 
     const timer = setTimeout(() => {
-      if (lastSyncVersion > 0) {
-        runSyncCheck();
-      } else if (hasRemoteData) {
-        setFirstSyncOpen(true);
+      if (isLoggedIn) {
+        if (lastSyncVersion > 0) {
+          runSyncCheck();
+        } else if (hasRemoteData) {
+          setFirstSyncOpen(true);
+        }
+      } else {
+        const dismissed = sessionStorage.getItem(LOGIN_PROMPT_KEY);
+        if (!dismissed) {
+          setLoginPromptOpen(true);
+        }
       }
     }, 500);
 
     return () => clearTimeout(timer);
-  }, [isAvailable, isLoggedIn, lastSyncVersion, hasRemoteData, runSyncCheck]);
+  }, [isAvailable, isLoggedIn, isChecking, lastSyncVersion, hasRemoteData, runSyncCheck]);
 
   // Poll server every 5s for changes from other devices (pauses when tab is hidden)
   useEffect(() => {
@@ -140,8 +157,77 @@ export function SyncManager() {
     await downloadData();
   };
 
+  // --- Login prompt handlers ---
+  const handleLoginPromptAuth = async () => {
+    if (!username.trim() || !password.trim()) {
+      toast.error('请输入用户名和密码');
+      return;
+    }
+    const success = isRegistering
+      ? await register(username.trim(), password.trim())
+      : await login(username.trim(), password.trim());
+    if (success) {
+      setLoginPromptOpen(false);
+      setUsername('');
+      setPassword('');
+    }
+  };
+
+  const handleLoginPromptSkip = () => {
+    sessionStorage.setItem(LOGIN_PROMPT_KEY, '1');
+    setLoginPromptOpen(false);
+  };
+
   return (
     <>
+      {/* Login prompt — shown once per session when not logged in */}
+      <Dialog open={loginPromptOpen} onOpenChange={setLoginPromptOpen}>
+        <DialogContent className="max-w-sm">
+          <DialogHeader>
+            <DialogTitle>{isRegistering ? '注册账号' : '登录账号'}</DialogTitle>
+            <DialogDescription>
+              登录后数据将自动同步到云端，支持多设备使用
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <Label>用户名</Label>
+              <Input
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                placeholder="请输入用户名"
+              />
+            </div>
+            <div>
+              <Label>密码</Label>
+              <Input
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="请输入密码"
+                onKeyDown={(e) => e.key === 'Enter' && handleLoginPromptAuth()}
+              />
+            </div>
+            <div className="text-sm text-muted-foreground">
+              {isRegistering ? (
+                <>已有账号？<button className="text-primary hover:underline" onClick={() => setIsRegistering(false)}>去登录</button></>
+              ) : (
+                <>没有账号？<button className="text-primary hover:underline" onClick={() => setIsRegistering(true)}>去注册</button></>
+              )}
+            </div>
+          </div>
+          <DialogFooter className="flex-col gap-2 sm:flex-col">
+            <Button onClick={handleLoginPromptAuth} disabled={isLoading} className="w-full">
+              <LogIn className="h-4 w-4 mr-1" />
+              {isLoading ? '处理中...' : isRegistering ? '注册' : '登录'}
+            </Button>
+            <Button variant="ghost" onClick={handleLoginPromptSkip} className="w-full">
+              暂不登录
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
       {/* First sync dialog — shown once after login when server has data */}
       <Dialog open={firstSyncOpen} onOpenChange={setFirstSyncOpen}>
         <DialogContent className="max-w-sm">

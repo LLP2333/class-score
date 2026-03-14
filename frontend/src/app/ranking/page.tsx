@@ -35,14 +35,20 @@ function getPresetDateRange(period: Exclude<TimePeriod, 'custom'>): DateRange {
 }
 
 function formatDate(d: Date): string {
-  return `${d.getFullYear()}/${d.getMonth() + 1}/${d.getDate()}`;
+  const mm = String(d.getMonth() + 1).padStart(2, '0');
+  const dd = String(d.getDate()).padStart(2, '0');
+  const hh = String(d.getHours()).padStart(2, '0');
+  const mi = String(d.getMinutes()).padStart(2, '0');
+  return `${d.getFullYear()}/${mm}/${dd} ${hh}:${mi}`;
 }
 
-function toDateInputValue(d: Date): string {
+function toDateTimeInputValue(d: Date): string {
   const y = d.getFullYear();
   const m = String(d.getMonth() + 1).padStart(2, '0');
   const day = String(d.getDate()).padStart(2, '0');
-  return `${y}-${m}-${day}`;
+  const hh = String(d.getHours()).padStart(2, '0');
+  const mi = String(d.getMinutes()).padStart(2, '0');
+  return `${y}-${m}-${day}T${hh}:${mi}`;
 }
 
 export default function RankingPage() {
@@ -50,16 +56,16 @@ export default function RankingPage() {
   const { groups } = useGroupStore();
   const { records } = useRecordStore();
   const [timePeriod, setTimePeriod] = useState<TimePeriod>('all');
-  const [customStart, setCustomStart] = useState(() => toDateInputValue(new Date()));
-  const [customEnd, setCustomEnd] = useState(() => toDateInputValue(new Date()));
+  const [customStart, setCustomStart] = useState(() => {
+    const d = new Date();
+    d.setHours(0, 0, 0, 0);
+    return toDateTimeInputValue(d);
+  });
+  const [customEnd, setCustomEnd] = useState(() => toDateTimeInputValue(new Date()));
 
   const activeDateRange = useMemo<DateRange>(() => {
     if (timePeriod === 'custom') {
-      const s = new Date(customStart);
-      s.setHours(0, 0, 0, 0);
-      const e = new Date(customEnd);
-      e.setHours(23, 59, 59, 999);
-      return { start: s, end: e };
+      return { start: new Date(customStart), end: new Date(customEnd) };
     }
     return getPresetDateRange(timePeriod);
   }, [timePeriod, customStart, customEnd]);
@@ -135,14 +141,14 @@ export default function RankingPage() {
         {timePeriod === 'custom' && (
           <div className="flex flex-wrap items-center gap-2">
             <input
-              type="date"
+              type="datetime-local"
               value={customStart}
               onChange={e => setCustomStart(e.target.value)}
               className="rounded-md border border-input bg-background px-3 py-1.5 text-sm shadow-sm"
             />
             <span className="text-muted-foreground text-sm">至</span>
             <input
-              type="date"
+              type="datetime-local"
               value={customEnd}
               onChange={e => setCustomEnd(e.target.value)}
               min={customStart}
