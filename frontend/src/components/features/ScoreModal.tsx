@@ -102,13 +102,17 @@ export function ScoreModal({ student, action, open, onClose, onSuccess }: ScoreM
             <label className="text-sm font-medium mb-2 block">
               {action === 'add' ? '加分' : '扣分'}原因
             </label>
-            <div className="flex flex-wrap gap-2">
+            <div
+              className="flex flex-wrap gap-2 max-h-32 overflow-y-auto min-w-0 rounded-md border border-border/40 p-2"
+              style={{ scrollbarWidth: 'thin' }}
+            >
               {filteredRules.map((rule) => (
                 <Button
                   key={rule.id}
                   variant={selectedRuleId === rule.id ? 'default' : 'outline'}
                   size="sm"
                   className={cn(
+                    'whitespace-normal h-auto text-left',
                     action === 'add' ? 'border-green-200' : 'border-red-200',
                     selectedRuleId === rule.id && (action === 'add' ? 'bg-green-600 hover:bg-green-700' : 'bg-red-600 hover:bg-red-700')
                   )}
