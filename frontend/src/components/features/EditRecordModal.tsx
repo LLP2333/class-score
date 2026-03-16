@@ -23,6 +23,7 @@ export function EditRecordModal({ record, open, onClose, onSuccess }: EditRecord
 
   const [score, setScore] = useState('');
   const [reason, setReason] = useState('');
+  const [ruleSearch, setRuleSearch] = useState('');
 
   useEffect(() => {
     if (record) {
@@ -58,14 +59,16 @@ export function EditRecordModal({ record, open, onClose, onSuccess }: EditRecord
     }
 
     toast.success('记录已修改');
+    setRuleSearch('');
     onClose();
     onSuccess?.();
   };
 
-  const filteredRules = rules.filter(r => r.type === (isAdd ? 'add' : 'minus'));
+  const allRules = rules.filter(r => r.type === (isAdd ? 'add' : 'minus'));
+  const filteredRules = allRules.filter(r => !ruleSearch.trim() || r.name.includes(ruleSearch.trim()));
 
   return (
-    <Dialog open={open} onOpenChange={(v) => !v && onClose()}>
+    <Dialog open={open} onOpenChange={(v) => { if (!v) { setRuleSearch(''); onClose(); } }}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle>编辑积分记录</DialogTitle>
@@ -97,16 +100,28 @@ export function EditRecordModal({ record, open, onClose, onSuccess }: EditRecord
             </div>
           )}
 
-          {filteredRules.length > 0 && (
+          {allRules.length > 0 && (
             <div>
-              <label className="text-sm font-medium mb-2 block">快速选择分值</label>
-              <div className="flex flex-wrap gap-2">
+              <div className="flex items-center gap-2 mb-2">
+                <label className="text-sm font-medium whitespace-nowrap">快速选择分值</label>
+                <Input
+                  placeholder="搜索关键词..."
+                  value={ruleSearch}
+                  onChange={(e) => setRuleSearch(e.target.value)}
+                  className="h-7 text-xs"
+                />
+              </div>
+              <div
+                className="flex flex-wrap gap-2 max-h-52 overflow-y-auto min-w-0 rounded-md border border-border/40 p-2"
+                style={{ scrollbarWidth: 'thin' }}
+              >
                 {filteredRules.map((rule) => (
                   <Button
                     key={rule.id}
                     variant={parseInt(score) === rule.score ? 'default' : 'outline'}
                     size="sm"
                     className={cn(
+                      'whitespace-normal h-auto text-left',
                       isAdd ? 'border-green-200' : 'border-red-200',
                       parseInt(score) === rule.score && (isAdd ? 'bg-green-600 hover:bg-green-700' : 'bg-red-600 hover:bg-red-700')
                     )}
