@@ -26,8 +26,11 @@ export function ScoreModal({ student, action, open, onClose, onSuccess }: ScoreM
   const [selectedScore, setSelectedScore] = useState(0);
   const [customScore, setCustomScore] = useState('');
   const [reason, setReason] = useState('');
+  const [ruleSearch, setRuleSearch] = useState('');
 
-  const filteredRules = rules.filter(r => r.type === action);
+  const filteredRules = rules
+    .filter(r => r.type === action)
+    .filter(r => !ruleSearch.trim() || r.name.includes(ruleSearch.trim()));
 
   const handleRuleSelect = (rule: Rule) => {
     setSelectedRuleId(rule.id);
@@ -67,6 +70,7 @@ export function ScoreModal({ student, action, open, onClose, onSuccess }: ScoreM
     setSelectedScore(0);
     setCustomScore('');
     setReason('');
+    setRuleSearch('');
     
     onClose();
     onSuccess?.();
@@ -75,7 +79,7 @@ export function ScoreModal({ student, action, open, onClose, onSuccess }: ScoreM
   if (!student) return null;
 
   return (
-    <Dialog open={open} onOpenChange={(open) => !open && onClose()}>
+    <Dialog open={open} onOpenChange={(isOpen) => { if (!isOpen) { setRuleSearch(''); onClose(); } }}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle>{action === 'add' ? '加分操作' : '扣分操作'}</DialogTitle>
@@ -99,11 +103,19 @@ export function ScoreModal({ student, action, open, onClose, onSuccess }: ScoreM
 
           {/* Rule quick select */}
           <div>
-            <label className="text-sm font-medium mb-2 block">
-              {action === 'add' ? '加分' : '扣分'}原因
-            </label>
+            <div className="flex items-center gap-2 mb-2">
+              <label className="text-sm font-medium whitespace-nowrap">
+                {action === 'add' ? '加分' : '扣分'}原因
+              </label>
+              <Input
+                placeholder="搜索关键词..."
+                value={ruleSearch}
+                onChange={(e) => setRuleSearch(e.target.value)}
+                className="h-7 text-xs"
+              />
+            </div>
             <div
-              className="flex flex-wrap gap-2 max-h-32 overflow-y-auto min-w-0 rounded-md border border-border/40 p-2"
+              className="flex flex-wrap gap-2 max-h-52 overflow-y-auto min-w-0 rounded-md border border-border/40 p-2"
               style={{ scrollbarWidth: 'thin' }}
             >
               {filteredRules.map((rule) => (
