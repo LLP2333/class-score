@@ -24,11 +24,14 @@ export function EditRecordModal({ record, open, onClose, onSuccess }: EditRecord
   const [score, setScore] = useState('');
   const [reason, setReason] = useState('');
   const [ruleSearch, setRuleSearch] = useState('');
+  const [selectedRuleId, setSelectedRuleId] = useState<string | null>(null);
 
   useEffect(() => {
     if (record) {
       setScore(Math.abs(record.score).toString());
-      setReason(record.reason);
+      const rule = record.ruleId ? rules.find(r => r.id === record.ruleId) : null;
+      setReason(rule?.name || record.reason || '');
+      setSelectedRuleId(record.ruleId);
     }
   }, [record]);
 
@@ -50,6 +53,7 @@ export function EditRecordModal({ record, open, onClose, onSuccess }: EditRecord
     updateRecord(record.id, {
       score: newScore,
       reason: reason,
+      ruleId: selectedRuleId,
     });
 
     if (student && scoreDiff !== 0) {
@@ -60,6 +64,7 @@ export function EditRecordModal({ record, open, onClose, onSuccess }: EditRecord
 
     toast.success('记录已修改');
     setRuleSearch('');
+    setSelectedRuleId(null);
     onClose();
     onSuccess?.();
   };
@@ -68,7 +73,7 @@ export function EditRecordModal({ record, open, onClose, onSuccess }: EditRecord
   const filteredRules = allRules.filter(r => !ruleSearch.trim() || r.name.includes(ruleSearch.trim()));
 
   return (
-    <Dialog open={open} onOpenChange={(v) => { if (!v) { setRuleSearch(''); onClose(); } }}>
+    <Dialog open={open} onOpenChange={(v) => { if (!v) { setRuleSearch(''); setSelectedRuleId(null); onClose(); } }}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle>编辑积分记录</DialogTitle>
@@ -118,16 +123,17 @@ export function EditRecordModal({ record, open, onClose, onSuccess }: EditRecord
                 {filteredRules.map((rule) => (
                   <Button
                     key={rule.id}
-                    variant={parseInt(score) === rule.score ? 'default' : 'outline'}
+                    variant={selectedRuleId === rule.id ? 'default' : 'outline'}
                     size="sm"
                     className={cn(
                       'whitespace-normal h-auto text-left',
                       isAdd ? 'border-green-200' : 'border-red-200',
-                      parseInt(score) === rule.score && (isAdd ? 'bg-green-600 hover:bg-green-700' : 'bg-red-600 hover:bg-red-700')
+                      selectedRuleId === rule.id && (isAdd ? 'bg-green-600 hover:bg-green-700' : 'bg-red-600 hover:bg-red-700')
                     )}
                     onClick={() => {
+                      setSelectedRuleId(rule.id);
                       setScore(rule.score.toString());
-                      if (!reason) setReason(rule.name);
+                      setReason(rule.name);
                     }}
                   >
                     {rule.icon} {rule.name} ({isAdd ? '+' : '-'}{rule.score})

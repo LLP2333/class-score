@@ -48,14 +48,15 @@ export function ScoreModal({ student, action, open, onClose, onSuccess }: ScoreM
     }
 
     const scoreValue = action === 'minus' ? -Math.abs(finalScore) : Math.abs(finalScore);
-    
+    const selectedRule = selectedRuleId ? rules.find(r => r.id === selectedRuleId) : null;
+
     // Add record
     addRecord({
       studentId: student.id,
       groupId: student.groupId,
       ruleId: selectedRuleId,
       score: scoreValue,
-      reason: reason || (action === 'add' ? '加分' : '扣分'),
+      reason: reason || selectedRule?.name || (action === 'add' ? '加分' : '扣分'),
     });
     
     // Update student score

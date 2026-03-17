@@ -169,8 +169,9 @@ export default function TimelinePage() {
                                   </span>
                                 )}
                               </div>
-                              <div className="text-sm text-muted-foreground mt-1">
-                                {rule?.icon || '📝'} {record.reason || rule?.name || '积分变动'}
+                              <div className="text-sm mt-1 flex items-center gap-1">
+                                <span>{rule?.icon || '📝'}</span>
+                                <span className="text-foreground">{rule?.name || record.reason || '积分变动'}</span>
                               </div>
                             </div>
                             
