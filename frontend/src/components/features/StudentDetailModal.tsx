@@ -179,7 +179,7 @@ export function StudentDetailModal({ student: studentProp, open, onClose, onUpda
                         <div className="flex items-center gap-2 min-w-0 flex-1">
                           <span>{rule?.icon || '📝'}</span>
                           <span className="text-sm truncate">
-                            {record.reason || rule?.name || '积分变动'}
+                            {rule?.name || record.reason || '积分变动'}
                           </span>
                         </div>
                         <div className="flex items-center gap-2 shrink-0">
