@@ -119,6 +119,43 @@ export const api = {
     }
   },
   
+  // Change password
+  async changePassword(
+    token: string,
+    oldPassword: string,
+    newPassword: string
+  ): Promise<ApiResponse<null>> {
+    try {
+      const response = await fetch(`${API_BASE}/api/change-password`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify({ oldPassword, newPassword }),
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        return {
+          success: true,
+          message: data.message || '密码修改成功',
+        };
+      }
+
+      return {
+        success: false,
+        error: data.error || '修改密码失败',
+      };
+    } catch {
+      return {
+        success: false,
+        error: '网络错误',
+      };
+    }
+  },
+
   // Get sync metadata (version + last modified time)
   async syncMeta(token: string): Promise<ApiResponse<SyncMetaResponse>> {
     try {

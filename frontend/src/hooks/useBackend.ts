@@ -79,6 +79,28 @@ export function useBackend() {
     }
   }, [isAvailable, setAuth]);
 
+  // Change password
+  const changePassword = useCallback(async (oldPassword: string, newPassword: string) => {
+    if (!isLoggedIn() || !token) {
+      toast.error('请先登录');
+      return false;
+    }
+
+    setIsLoading(true);
+    try {
+      const result = await api.changePassword(token, oldPassword, newPassword);
+      if (result.success) {
+        toast.success('密码修改成功');
+        return true;
+      } else {
+        toast.error(result.error || '修改密码失败');
+        return false;
+      }
+    } finally {
+      setIsLoading(false);
+    }
+  }, [isLoggedIn, token]);
+
   // Logout
   const logout = useCallback(() => {
     clearAuth();
@@ -210,6 +232,7 @@ export function useBackend() {
     checkBackend,
     register,
     login,
+    changePassword,
     logout,
     checkSyncStatus,
     uploadData,

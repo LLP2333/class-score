@@ -10,14 +10,14 @@ import { useSettingsStore, useStudentStore, useSyncStore, exportAllData, importA
 import { useBackend } from '@/hooks/useBackend';
 import { toast } from 'sonner';
 import * as XLSX from 'xlsx';
-import { Download, Upload, Trash2, Cloud, CloudOff, LogIn, LogOut, RefreshCw } from 'lucide-react';
+import { Download, Upload, Trash2, Cloud, CloudOff, LogIn, LogOut, RefreshCw, KeyRound } from 'lucide-react';
 import { formatRelativeTime } from '@/lib/utils';
 
 export default function SettingsPage() {
   const { classInfo, setClassInfo } = useSettingsStore();
   const { addStudent } = useStudentStore();
   
-  const { isAvailable, isLoggedIn, user, isDirty, isLoading, login, logout, register, uploadData, downloadData, checkSyncStatus } = useBackend();
+  const { isAvailable, isLoggedIn, user, isDirty, isLoading, login, logout, register, changePassword, uploadData, downloadData, checkSyncStatus } = useBackend();
   const lastSyncAt = useSyncStore((s) => s.lastSyncAt);
 
   // Modal states
@@ -26,6 +26,11 @@ export default function SettingsPage() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   
+  const [changePasswordOpen, setChangePasswordOpen] = useState(false);
+  const [oldPassword, setOldPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+
   const [editClassInfoOpen, setEditClassInfoOpen] = useState(false);
   const [editClassName, setEditClassName] = useState(classInfo.name);
   const [editTeacherName, setEditTeacherName] = useState(classInfo.teacher);
@@ -58,6 +63,30 @@ export default function SettingsPage() {
       setLoginModalOpen(false);
       setUsername('');
       setPassword('');
+    }
+  };
+
+  // Change password
+  const handleChangePassword = async () => {
+    if (!oldPassword.trim()) {
+      toast.error('请输入当前密码');
+      return;
+    }
+    if (newPassword.length < 4) {
+      toast.error('新密码长度至少4个字符');
+      return;
+    }
+    if (newPassword !== confirmPassword) {
+      toast.error('两次输入的新密码不一致');
+      return;
+    }
+
+    const success = await changePassword(oldPassword, newPassword);
+    if (success) {
+      setChangePasswordOpen(false);
+      setOldPassword('');
+      setNewPassword('');
+      setConfirmPassword('');
     }
   };
 
@@ -258,6 +287,10 @@ export default function SettingsPage() {
                         <RefreshCw className="h-4 w-4 mr-1" />
                         检查同步
                       </Button>
+                      <Button variant="ghost" onClick={() => setChangePasswordOpen(true)}>
+                        <KeyRound className="h-4 w-4 mr-1" />
+                        修改密码
+                      </Button>
                       <Button variant="ghost" onClick={() => {
                         if (isDirty) {
                           if (!confirm('本地有未同步的修改，退出后这些修改不会自动上传。\n\n确定要退出登录吗？')) return;
@@ -377,6 +410,50 @@ export default function SettingsPage() {
           <DialogFooter>
             <Button variant="outline" onClick={() => setEditClassInfoOpen(false)}>取消</Button>
             <Button onClick={handleSaveClassInfo}>保存</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Change Password Modal */}
+      <Dialog open={changePasswordOpen} onOpenChange={setChangePasswordOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>修改密码</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <Label>当前密码</Label>
+              <Input
+                type="password"
+                value={oldPassword}
+                onChange={(e) => setOldPassword(e.target.value)}
+                placeholder="请输入当前密码"
+              />
+            </div>
+            <div>
+              <Label>新密码</Label>
+              <Input
+                type="password"
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
+                placeholder="请输入新密码（至少4个字符）"
+              />
+            </div>
+            <div>
+              <Label>确认新密码</Label>
+              <Input
+                type="password"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                placeholder="请再次输入新密码"
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setChangePasswordOpen(false)}>取消</Button>
+            <Button onClick={handleChangePassword} disabled={isLoading}>
+              {isLoading ? '处理中...' : '确认修改'}
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

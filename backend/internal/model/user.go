@@ -30,6 +30,12 @@ type LoginResponse struct {
 	Message  string `json:"message"`
 }
 
+// ChangePasswordRequest 修改密码请求
+type ChangePasswordRequest struct {
+	OldPassword string `json:"oldPassword"`
+	NewPassword string `json:"newPassword"`
+}
+
 // SyncData 同步数据结构
 type SyncData struct {
 	Version         string      `json:"version"`

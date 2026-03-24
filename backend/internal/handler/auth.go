@@ -135,6 +135,61 @@ func (h *Handler) Login(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
+// ChangePassword 修改密码
+func (h *Handler) ChangePassword(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		h.respondError(w, http.StatusMethodNotAllowed, "方法不允许")
+		return
+	}
+
+	// 验证Token
+	tokenStr := h.getTokenFromRequest(r)
+	if tokenStr == "" {
+		h.respondError(w, http.StatusUnauthorized, "未提供Token")
+		return
+	}
+
+	username, err := h.validateToken(tokenStr)
+	if err != nil {
+		h.respondError(w, http.StatusUnauthorized, "Token无效或已过期")
+		return
+	}
+
+	var req model.ChangePasswordRequest
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		h.respondError(w, http.StatusBadRequest, "请求格式错误")
+		return
+	}
+
+	// 验证旧密码
+	_, err = h.sqliteStore.ValidateUser(username, req.OldPassword)
+	if err != nil {
+		if errors.Is(err, store.ErrInvalidPass) {
+			h.respondError(w, http.StatusUnauthorized, "当前密码错误")
+			return
+		}
+		h.respondError(w, http.StatusInternalServerError, "验证失败")
+		return
+	}
+
+	// 验证新密码
+	if len(req.NewPassword) < 4 {
+		h.respondError(w, http.StatusBadRequest, "新密码长度至少4个字符")
+		return
+	}
+
+	// 更新密码
+	if err := h.sqliteStore.UpdateUserPassword(username, req.NewPassword); err != nil {
+		h.respondError(w, http.StatusInternalServerError, "修改密码失败")
+		return
+	}
+
+	h.respondJSON(w, http.StatusOK, model.APIResponse{
+		Success: true,
+		Message: "密码修改成功",
+	})
+}
+
 // generateToken 生成JWT Token
 func (h *Handler) generateToken(username string) (string, error) {
 	claims := jwt.MapClaims{

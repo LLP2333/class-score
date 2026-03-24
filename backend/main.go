@@ -56,6 +56,7 @@ func main() {
 	mux.HandleFunc("/api/health", h.Health)
 	mux.HandleFunc("/api/register", h.Register)
 	mux.HandleFunc("/api/login", h.Login)
+	mux.HandleFunc("/api/change-password", h.ChangePassword)
 	mux.HandleFunc("/api/sync/meta", h.SyncMeta)
 	mux.HandleFunc("/api/sync/upload", h.SyncUpload)
 	mux.HandleFunc("/api/sync/download", h.SyncDownload)
