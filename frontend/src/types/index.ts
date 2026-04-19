@@ -134,6 +134,38 @@ export interface SyncUploadResponse {
   last_modified_at: string;
 }
 
+// Pet species definition
+export interface PetSpecies {
+  id: string;
+  name: string;
+  element: 'fire' | 'water' | 'grass' | 'electric' | 'ice' | 'dragon';
+  stages: PetStage[];
+}
+
+// Pet evolution stage
+export interface PetStage {
+  level: number;
+  name: string;
+  emoji: string;
+  minScore: number;
+  description: string;
+}
+
+// Student's pet instance
+export interface StudentPet {
+  studentId: string;
+  speciesId: string;
+  nickname: string;
+  assignedAt: string;
+}
+
+// Pet system config
+export interface PetConfig {
+  enabled: boolean;
+  showOnStudentCard: boolean;
+  evolutionThresholds: number[];
+}
+
 // Export data type (for backup/sync)
 export interface ExportData {
   version: string;
@@ -147,4 +179,7 @@ export interface ExportData {
   exchanges: Exchange[];
   rollCallHistory: RollCallRecord[];
   settings: Settings;
+  petConfig?: PetConfig;
+  petSpecies?: PetSpecies[];
+  studentPets?: StudentPet[];
 }

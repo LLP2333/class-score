@@ -7,6 +7,7 @@ export { useProductStore } from './useProductStore';
 export { useSettingsStore } from './useSettingsStore';
 export { useAuthStore } from './useAuthStore';
 export { useSyncStore, setSyncing } from './useSyncStore';
+export { usePetStore } from './usePetStore';
 
 // Combined data export/import utilities
 import { useStudentStore } from './useStudentStore';
@@ -15,6 +16,7 @@ import { useRuleStore } from './useRuleStore';
 import { useRecordStore } from './useRecordStore';
 import { useProductStore } from './useProductStore';
 import { useSettingsStore } from './useSettingsStore';
+import { usePetStore } from './usePetStore';
 import { setSyncing } from './useSyncStore';
 import type { ExportData } from '@/types';
 
@@ -31,6 +33,9 @@ export function exportAllData(): ExportData {
     exchanges: useProductStore.getState().exchanges,
     rollCallHistory: useSettingsStore.getState().rollCallHistory,
     settings: useSettingsStore.getState().settings,
+    petConfig: usePetStore.getState().config,
+    petSpecies: usePetStore.getState().species,
+    studentPets: usePetStore.getState().studentPets,
   };
 }
 
@@ -56,6 +61,9 @@ export function importAllData(data: ExportData, fromSync = false): boolean {
     if (data.exchanges) useProductStore.getState().setExchanges(data.exchanges);
     if (data.rollCallHistory) useSettingsStore.getState().setRollCallHistory(data.rollCallHistory);
     if (data.settings) useSettingsStore.getState().setSettings(data.settings);
+    if (data.petConfig) usePetStore.getState().setConfig(data.petConfig);
+    if (data.petSpecies) usePetStore.getState().setSpecies(data.petSpecies);
+    if (data.studentPets) usePetStore.getState().setStudentPets(data.studentPets);
 
     if (fromSync) setSyncing(false);
     
@@ -74,9 +82,11 @@ export function clearAllData(): void {
   useRecordStore.getState().clearRecords();
   useProductStore.getState().clearAll();
   useSettingsStore.getState().clearAll();
+  usePetStore.getState().clearAll();
 }
 
 export function initDefaultData(): void {
   useRuleStore.getState().initDefaultRules();
   useProductStore.getState().initDefaultProducts();
+  usePetStore.getState().initDefaultSpecies();
 }

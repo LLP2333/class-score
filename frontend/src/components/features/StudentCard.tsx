@@ -4,6 +4,8 @@ import { cn, getAvatarClass } from '@/lib/utils';
 import type { Student } from '@/types';
 import { Button } from '@/components/ui/button';
 import { Plus, Minus } from 'lucide-react';
+import { usePetStore } from '@/store/usePetStore';
+import { PetMini } from './PetDisplay';
 
 interface StudentCardProps {
   student: Student;
@@ -13,6 +15,12 @@ interface StudentCardProps {
 }
 
 export function StudentCard({ student, onAddScore, onMinusScore, onClick }: StudentCardProps) {
+  const { config, getStudentPet, getPetStage, getPetSpecies } = usePetStore();
+  const pet = getStudentPet(student.id);
+  const stage = pet ? getPetStage(student.id, student.totalScore) : null;
+  const species = pet ? getPetSpecies(pet.speciesId) : null;
+  const showPet = config.enabled && config.showOnStudentCard && pet;
+
   return (
     <div
       className={cn(
@@ -22,15 +30,22 @@ export function StudentCard({ student, onAddScore, onMinusScore, onClick }: Stud
       )}
       onClick={onClick}
     >
-      {/* Avatar */}
-      <div
-        className={cn(
-          'w-14 h-14 rounded-full flex items-center justify-center',
-          'text-white text-xl font-semibold',
-          getAvatarClass(student.avatar)
+      {/* Avatar with pet */}
+      <div className="relative">
+        <div
+          className={cn(
+            'w-14 h-14 rounded-full flex items-center justify-center',
+            'text-white text-xl font-semibold',
+            getAvatarClass(student.avatar)
+          )}
+        >
+          {student.name.charAt(0)}
+        </div>
+        {showPet && stage && species && (
+          <div className="absolute -bottom-1 -right-2">
+            <PetMini stage={stage} species={species} />
+          </div>
         )}
-      >
-        {student.name.charAt(0)}
       </div>
       
       {/* Name */}

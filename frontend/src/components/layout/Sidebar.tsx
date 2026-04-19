@@ -24,6 +24,7 @@ const navItems = [
   { href: '/analysis', label: '数据分析', icon: BarChart3, emoji: '📊' },
   { href: '/shop', label: '积分商城', icon: ShoppingCart, emoji: '🛒' },
   { href: '/rules', label: '积分规则', icon: ClipboardList, emoji: '📋' },
+  { href: '/pets', label: '宠物乐园', icon: Wrench, emoji: '🐾' },
   { href: '/tools', label: '工具箱', icon: Wrench, emoji: '🧰' },
   { href: '/settings', label: '系统设置', icon: Settings, emoji: '⚙️' },
 ];

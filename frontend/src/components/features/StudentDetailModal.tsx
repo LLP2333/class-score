@@ -10,6 +10,8 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { cn, getAvatarClass, formatRelativeTime } from '@/lib/utils';
 import type { Student, ScoreRecord } from '@/types';
 import { useGroupStore, useStudentStore, useRecordStore, useRuleStore } from '@/store';
+import { usePetStore } from '@/store/usePetStore';
+import { PetDisplay, PetEvolutionPreview } from '@/components/features/PetDisplay';
 import { EditRecordModal } from '@/components/features/EditRecordModal';
 import { toast } from 'sonner';
 
@@ -25,6 +27,7 @@ export function StudentDetailModal({ student: studentProp, open, onClose, onUpda
   const { getStudentById, updateStudent, deleteStudent } = useStudentStore();
   const { getRecordsByStudentId, deleteRecordsByStudentId, deleteRecord } = useRecordStore();
   const { getRuleById } = useRuleStore();
+  const { config: petConfig, getStudentPet, getPetStage, getPetSpecies } = usePetStore();
   
   const [isEditing, setIsEditing] = useState(false);
   const [editName, setEditName] = useState('');
@@ -162,6 +165,38 @@ export function StudentDetailModal({ student: studentProp, open, onClose, onUpda
             <div className="text-2xl font-bold text-primary">{student.totalScore}分</div>
             {group && <Badge variant="secondary">{group.name}</Badge>}
           </div>
+
+          {/* Pet info */}
+          {petConfig.enabled && (() => {
+            const pet = getStudentPet(student.id);
+            const stage = pet ? getPetStage(student.id, student.totalScore) : null;
+            const sp = pet ? getPetSpecies(pet.speciesId) : null;
+            if (!pet || !stage || !sp) return null;
+
+            const nextStage = sp.stages.find((s) => s.level === stage.level + 1);
+
+            return (
+              <div className="p-3 bg-muted/30 rounded-lg space-y-2">
+                <div className="flex items-center gap-3">
+                  <PetDisplay stage={stage} species={sp} size="sm" animate />
+                  <div>
+                    <div className="text-sm font-semibold">{pet.nickname}</div>
+                    <div className="text-xs text-muted-foreground">
+                      {stage.name} · Lv.{stage.level}
+                    </div>
+                  </div>
+                  {nextStage && (
+                    <div className="ml-auto text-right">
+                      <div className="text-xs text-muted-foreground">下次进化</div>
+                      <div className="text-sm font-semibold text-primary">
+                        还需{nextStage.minScore - student.totalScore}分
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            );
+          })()}
 
           {/* Recent records */}
           <div>
