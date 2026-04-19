@@ -252,3 +252,66 @@
 .pet-evolve-flash {
   animation: petEvolveFlash 0.8s ease-out forwards;
 }
+
+/* Pet card entrance */
+@keyframes petCardEntrance {
+  0% { opacity: 0; transform: translateY(20px) scale(0.95); }
+  100% { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.pet-card-entrance {
+  animation: petCardEntrance 0.5s ease-out both;
+}
+
+/* Evolution stage pop-in */
+@keyframes petStagePop {
+  0% { opacity: 0; transform: scale(0) translateY(10px); }
+  60% { opacity: 1; transform: scale(1.15) translateY(-2px); }
+  100% { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+.pet-stage-pop {
+  animation: petStagePop 0.4s ease-out both;
+}
+
+/* Arrow line grow */
+@keyframes petArrowLine {
+  0% { transform: scaleX(0); opacity: 0; }
+  100% { transform: scaleX(1); opacity: 1; }
+}
+
+.pet-arrow-line {
+  animation: petArrowLine 0.3s ease-out both;
+  transform-origin: left center;
+}
+
+/* Arrow pulse */
+@keyframes petArrowPulse {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 1; }
+}
+
+.pet-arrow-pulse {
+  animation: petArrowPulse 2s ease-in-out infinite;
+}
+
+/* Floating orbs */
+@keyframes petOrbFloat {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33% { transform: translate(8px, -10px) scale(1.1); }
+  66% { transform: translate(-5px, 5px) scale(0.95); }
+}
+
+@keyframes petOrbFloatReverse {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33% { transform: translate(-8px, 8px) scale(1.05); }
+  66% { transform: translate(10px, -5px) scale(0.9); }
+}
+
+.pet-orb-float {
+  animation: petOrbFloat 6s ease-in-out infinite;
+}
+
+.pet-orb-float-reverse {
+  animation: petOrbFloatReverse 8s ease-in-out infinite;
+}

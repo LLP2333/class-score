@@ -3,8 +3,6 @@ import { persist } from 'zustand/middleware';
 import type { PetSpecies, PetStage, StudentPet, PetConfig } from '@/types';
 import { generateId } from '@/lib/utils';
 
-const DEFAULT_THRESHOLDS = [0, 20, 50, 100, 200];
-
 const DEFAULT_SPECIES: PetSpecies[] = [
   {
     id: 'fire_dragon',
@@ -89,6 +87,11 @@ interface PetStore {
   setSpecies: (species: PetSpecies[]) => void;
   setStudentPets: (pets: StudentPet[]) => void;
 
+  addSpecies: (data: Omit<PetSpecies, 'id'>) => PetSpecies;
+  updateSpecies: (id: string, updates: Partial<Omit<PetSpecies, 'id'>>) => void;
+  deleteSpecies: (id: string) => void;
+  updateSpeciesStages: (speciesId: string, stages: PetStage[]) => void;
+
   assignPet: (studentId: string, speciesId: string, nickname?: string) => void;
   removePet: (studentId: string) => void;
   updatePetNickname: (studentId: string, nickname: string) => void;
@@ -96,9 +99,7 @@ interface PetStore {
   getPetStage: (studentId: string, studentScore: number) => PetStage | null;
   getPetSpecies: (speciesId: string) => PetSpecies | undefined;
 
-  updateSpeciesStageThreshold: (speciesId: string, level: number, minScore: number) => void;
-  updateAllThresholds: (thresholds: number[]) => void;
-
+  resetToDefault: () => void;
   initDefaultSpecies: () => void;
   clearAll: () => void;
 }
@@ -109,19 +110,46 @@ export const usePetStore = create<PetStore>()(
       config: {
         enabled: true,
         showOnStudentCard: true,
-        evolutionThresholds: DEFAULT_THRESHOLDS,
       },
       species: DEFAULT_SPECIES,
       studentPets: [],
 
       setConfig: (updates) => {
-        set((state) => ({
-          config: { ...state.config, ...updates },
-        }));
+        set((state) => ({ config: { ...state.config, ...updates } }));
       },
 
       setSpecies: (species) => set({ species }),
       setStudentPets: (pets) => set({ studentPets: pets }),
+
+      addSpecies: (data) => {
+        const newSpecies: PetSpecies = { id: generateId(), ...data };
+        set((state) => ({ species: [...state.species, newSpecies] }));
+        return newSpecies;
+      },
+
+      updateSpecies: (id, updates) => {
+        set((state) => ({
+          species: state.species.map((s) =>
+            s.id === id ? { ...s, ...updates } : s
+          ),
+        }));
+      },
+
+      deleteSpecies: (id) => {
+        set((state) => ({
+          species: state.species.filter((s) => s.id !== id),
+          studentPets: state.studentPets.filter((p) => p.speciesId !== id),
+        }));
+      },
+
+      updateSpeciesStages: (speciesId, stages) => {
+        const normalized = stages.map((s, i) => ({ ...s, level: i }));
+        set((state) => ({
+          species: state.species.map((sp) =>
+            sp.id === speciesId ? { ...sp, stages: normalized } : sp
+          ),
+        }));
+      },
 
       assignPet: (studentId, speciesId, nickname) => {
         const existing = get().studentPets.find((p) => p.studentId === studentId);
@@ -141,9 +169,7 @@ export const usePetStore = create<PetStore>()(
             nickname: nickname || species?.name || '我的宠物',
             assignedAt: new Date().toISOString(),
           };
-          set((state) => ({
-            studentPets: [...state.studentPets, pet],
-          }));
+          set((state) => ({ studentPets: [...state.studentPets, pet] }));
         }
       },
 
@@ -168,9 +194,8 @@ export const usePetStore = create<PetStore>()(
       getPetStage: (studentId, studentScore) => {
         const pet = get().studentPets.find((p) => p.studentId === studentId);
         if (!pet) return null;
-
         const species = get().species.find((s) => s.id === pet.speciesId);
-        if (!species) return null;
+        if (!species || species.stages.length === 0) return null;
 
         let currentStage = species.stages[0];
         for (const stage of species.stages) {
@@ -185,37 +210,12 @@ export const usePetStore = create<PetStore>()(
         return get().species.find((s) => s.id === speciesId);
       },
 
-      updateSpeciesStageThreshold: (speciesId, level, minScore) => {
-        set((state) => ({
-          species: state.species.map((s) =>
-            s.id === speciesId
-              ? {
-                  ...s,
-                  stages: s.stages.map((st) =>
-                    st.level === level ? { ...st, minScore } : st
-                  ),
-                }
-              : s
-          ),
-        }));
-      },
-
-      updateAllThresholds: (thresholds) => {
-        set((state) => ({
-          config: { ...state.config, evolutionThresholds: thresholds },
-          species: state.species.map((s) => ({
-            ...s,
-            stages: s.stages.map((st, i) => ({
-              ...st,
-              minScore: thresholds[i] ?? st.minScore,
-            })),
-          })),
-        }));
+      resetToDefault: () => {
+        set({ species: DEFAULT_SPECIES });
       },
 
       initDefaultSpecies: () => {
-        const { species } = get();
-        if (species.length === 0) {
+        if (get().species.length === 0) {
           set({ species: DEFAULT_SPECIES });
         }
       },
@@ -223,16 +223,10 @@ export const usePetStore = create<PetStore>()(
       clearAll: () => {
         set({
           studentPets: [],
-          config: {
-            enabled: true,
-            showOnStudentCard: true,
-            evolutionThresholds: DEFAULT_THRESHOLDS,
-          },
+          config: { enabled: true, showOnStudentCard: true },
         });
       },
     }),
-    {
-      name: 'classScore_pets',
-    }
+    { name: 'classScore_pets' }
   )
 );

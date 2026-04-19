@@ -138,7 +138,8 @@ export interface SyncUploadResponse {
 export interface PetSpecies {
   id: string;
   name: string;
-  element: 'fire' | 'water' | 'grass' | 'electric' | 'ice' | 'dragon';
+  element: 'fire' | 'water' | 'grass' | 'electric' | 'ice' | 'dragon' | 'custom';
+  color?: string;
   stages: PetStage[];
 }
 
@@ -147,6 +148,7 @@ export interface PetStage {
   level: number;
   name: string;
   emoji: string;
+  image?: string;
   minScore: number;
   description: string;
 }
@@ -163,7 +165,6 @@ export interface StudentPet {
 export interface PetConfig {
   enabled: boolean;
   showOnStudentCard: boolean;
-  evolutionThresholds: number[];
 }
 
 // Export data type (for backup/sync)
