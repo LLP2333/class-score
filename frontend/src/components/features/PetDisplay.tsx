@@ -143,7 +143,7 @@ interface PetEvolutionPreviewProps {
 export function PetEvolutionPreview({ species, currentScore }: PetEvolutionPreviewProps) {
   let currentLevel = 0;
   for (const stage of species.stages) {
-    if (currentScore >= stage.minScore) {
+    if (currentScore >= stage.min_score) {
       currentLevel = stage.level;
     }
   }
@@ -151,7 +151,7 @@ export function PetEvolutionPreview({ species, currentScore }: PetEvolutionPrevi
   return (
     <div className="flex items-center gap-1 sm:gap-3 overflow-x-auto pb-2">
       {species.stages.map((stage, index) => {
-        const isReached = currentScore >= stage.minScore;
+        const isReached = currentScore >= stage.min_score;
         const isCurrent = stage.level === currentLevel;
         const isNext = stage.level === currentLevel + 1;
 
@@ -173,7 +173,7 @@ export function PetEvolutionPreview({ species, currentScore }: PetEvolutionPrevi
               <PetDisplay stage={stage} species={species} size="sm" animate={isCurrent} />
               <div className="text-center">
                 <div className={cn('text-xs font-medium', !isReached && 'text-muted-foreground/50')}>{stage.name}</div>
-                <div className={cn('text-[10px]', isReached ? 'text-primary' : 'text-muted-foreground/40')}>{stage.minScore}分</div>
+                <div className={cn('text-[10px]', isReached ? 'text-primary' : 'text-muted-foreground/40')}>{stage.min_score}分</div>
               </div>
             </div>
           </div>

@@ -1,85 +1,23 @@
-// Student type
-export interface Student {
-  id: string;
-  name: string;
-  avatar: number; // 1-8
-  groupId: string | null;
-  totalScore: number;
-  createdAt: string;
-}
+export type {
+  ClassData as Class,
+  StudentData as Student,
+  GroupData as Group,
+  RuleData as Rule,
+  RecordData as ScoreRecord,
+  ProductData as Product,
+  ExchangeData as Exchange,
+  PetSpeciesData as PetSpecies,
+  PetStageData as PetStage,
+  StudentPetData as StudentPet,
+  PetConfigData as PetConfig,
+  ClassSettingsData as ClassSettings,
+  RollCallData as RollCallRecord,
+  LoginData,
+  MigrateResult,
+} from '@/lib/api';
 
-// Group type
-export interface Group {
-  id: string;
-  name: string;
-  color: number; // 1-8
-  leaderId: string | null;
-  createdAt: string;
-}
+export type UserRole = 'teacher' | 'student';
 
-// Rule type
-export interface Rule {
-  id: string;
-  name: string;
-  score: number;
-  type: 'add' | 'minus';
-  category: string;
-  icon: string;
-}
-
-// Score record type
-export interface ScoreRecord {
-  id: string;
-  studentId: string;
-  groupId: string | null;
-  ruleId: string | null;
-  score: number;
-  reason: string;
-  createdAt: string;
-}
-
-// Product type (for shop)
-export interface Product {
-  id: string;
-  name: string;
-  price: number;
-  stock: number;
-  icon: string;
-  exchangeCount: number;
-}
-
-// Exchange record type
-export interface Exchange {
-  id: string;
-  studentId: string;
-  productId: string;
-  productName: string;
-  price: number;
-  createdAt: string;
-}
-
-// Roll call history type
-export interface RollCallRecord {
-  id: string;
-  students: string[]; // student names
-  createdAt: string;
-}
-
-// Class info type
-export interface ClassInfo {
-  name: string;
-  teacher: string;
-  createdAt: string;
-}
-
-// Settings type
-export interface Settings {
-  theme: 'light' | 'dark';
-  animationSpeed: 'slow' | 'normal' | 'fast';
-  soundEnabled: boolean;
-}
-
-// Statistics type
 export interface Statistics {
   studentCount: number;
   groupCount: number;
@@ -88,99 +26,12 @@ export interface Statistics {
   totalRecords: number;
 }
 
-// Weekly trend data
 export interface WeeklyTrend {
   label: string;
   value: number;
 }
 
-// Category distribution data
 export interface CategoryDistribution {
   name: string;
   value: number;
-}
-
-// Backend user type
-export interface BackendUser {
-  username: string;
-}
-
-// API response types
-export interface ApiResponse<T = unknown> {
-  success: boolean;
-  data?: T;
-  error?: string;
-  message?: string;
-}
-
-export interface LoginResponse {
-  token: string;
-  username: string;
-  has_data?: boolean;
-}
-
-export interface RegisterResponse {
-  token: string;
-  username: string;
-}
-
-export interface SyncMetaResponse {
-  version: number;
-  last_modified_at: string;
-}
-
-export interface SyncUploadResponse {
-  version: number;
-  last_modified_at: string;
-}
-
-// Pet species definition
-export interface PetSpecies {
-  id: string;
-  name: string;
-  element: 'fire' | 'water' | 'grass' | 'electric' | 'ice' | 'dragon' | 'custom';
-  color?: string;
-  stages: PetStage[];
-}
-
-// Pet evolution stage
-export interface PetStage {
-  level: number;
-  name: string;
-  emoji: string;
-  image?: string;
-  minScore: number;
-  description: string;
-}
-
-// Student's pet instance
-export interface StudentPet {
-  studentId: string;
-  speciesId: string;
-  nickname: string;
-  assignedAt: string;
-}
-
-// Pet system config
-export interface PetConfig {
-  enabled: boolean;
-  showOnStudentCard: boolean;
-}
-
-// Export data type (for backup/sync)
-export interface ExportData {
-  version: string;
-  exportedAt: string;
-  classInfo: ClassInfo;
-  students: Student[];
-  groups: Group[];
-  rules: Rule[];
-  products: Product[];
-  scoreRecords: ScoreRecord[];
-  exchanges: Exchange[];
-  rollCallHistory: RollCallRecord[];
-  settings: Settings;
-  petConfig?: PetConfig;
-  petSpecies?: PetSpecies[];
-  studentPets?: StudentPet[];
 }

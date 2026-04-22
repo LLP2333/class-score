@@ -1,102 +1,90 @@
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
-import type { ScoreRecord } from '@/types';
-import { generateId } from '@/lib/utils';
+import { api } from '@/lib/api';
+import type { RecordData } from '@/lib/api';
 
 interface RecordStore {
-  records: ScoreRecord[];
-  
-  // Actions
-  addRecord: (data: Omit<ScoreRecord, 'id' | 'createdAt'>) => ScoreRecord;
-  updateRecord: (id: string, updates: Partial<Pick<ScoreRecord, 'score' | 'reason' | 'ruleId'>>) => ScoreRecord | null;
-  deleteRecord: (id: string) => ScoreRecord | null;
-  getRecordById: (id: string) => ScoreRecord | undefined;
-  getRecordsByStudentId: (studentId: string) => ScoreRecord[];
-  getRecordsByGroupId: (groupId: string) => ScoreRecord[];
-  getRecentRecords: (limit?: number) => ScoreRecord[];
-  setRecords: (records: ScoreRecord[]) => void;
+  records: RecordData[];
+  loading: boolean;
+
+  fetchRecords: (classId: number, limit?: number) => Promise<void>;
+  addRecord: (classId: number, data: { student_id: number; group_id?: number | null; rule_id?: number | null; score: number; reason?: string }) => Promise<RecordData | null>;
+  updateRecord: (id: number, updates: { score?: number; reason?: string; rule_id?: number | null }) => Promise<RecordData | null>;
+  deleteRecord: (id: number) => Promise<RecordData | null>;
+  getRecordById: (id: number) => RecordData | undefined;
+  getRecordsByStudentId: (studentId: number) => RecordData[];
+  getRecordsByGroupId: (groupId: number) => RecordData[];
+  getRecentRecords: (limit?: number) => RecordData[];
+  setRecords: (records: RecordData[]) => void;
   clearRecords: () => void;
-  deleteRecordsByStudentId: (studentId: string) => void;
 }
 
 export const useRecordStore = create<RecordStore>()(
-  persist(
-    (set, get) => ({
-      records: [],
-      
-      addRecord: (data) => {
-        const newRecord: ScoreRecord = {
-          id: generateId(),
-          createdAt: new Date().toISOString(),
-          studentId: data.studentId,
-          groupId: data.groupId || null,
-          ruleId: data.ruleId || null,
-          score: data.score,
-          reason: data.reason || '',
-        };
-        set((state) => ({ records: [...state.records, newRecord] }));
-        return newRecord;
-      },
+  (set, get) => ({
+    records: [],
+    loading: false,
 
-      updateRecord: (id, updates) => {
-        const records = get().records;
-        const index = records.findIndex(r => r.id === id);
-        if (index === -1) return null;
+    fetchRecords: async (classId, limit) => {
+      set({ loading: true });
+      const result = await api.listRecords(classId, limit);
+      if (result.success && result.data) {
+        set({ records: result.data });
+      }
+      set({ loading: false });
+    },
 
-        const updatedRecord = { ...records[index], ...updates };
-        const newRecords = [...records];
-        newRecords[index] = updatedRecord;
-        set({ records: newRecords });
-        return updatedRecord;
-      },
+    addRecord: async (classId, data) => {
+      const result = await api.createRecord(classId, data);
+      if (result.success && result.data) {
+        set((state) => ({ records: [result.data!, ...state.records] }));
+        return result.data;
+      }
+      return null;
+    },
 
-      deleteRecord: (id) => {
-        const record = get().records.find(r => r.id === id);
-        if (!record) return null;
+    updateRecord: async (id, updates) => {
+      const result = await api.updateRecord(id, updates);
+      if (result.success && result.data) {
+        const updated = result.data;
         set((state) => ({
-          records: state.records.filter(r => r.id !== id)
+          records: state.records.map(r => r.id === id ? updated : r),
+        }));
+        return updated;
+      }
+      return null;
+    },
+
+    deleteRecord: async (id) => {
+      const record = get().records.find(r => r.id === id);
+      if (!record) return null;
+      const result = await api.deleteRecord(id);
+      if (result.success) {
+        set((state) => ({
+          records: state.records.filter(r => r.id !== id),
         }));
         return record;
-      },
+      }
+      return null;
+    },
 
-      getRecordById: (id) => {
-        return get().records.find(r => r.id === id);
-      },
+    getRecordById: (id) => get().records.find(r => r.id === id),
 
-      getRecordsByStudentId: (studentId) => {
-        return get().records
-          .filter(r => r.studentId === studentId)
-          .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
-      },
-      
-      getRecordsByGroupId: (groupId) => {
-        return get().records
-          .filter(r => r.groupId === groupId)
-          .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
-      },
-      
-      getRecentRecords: (limit = 50) => {
-        return [...get().records]
-          .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
-          .slice(0, limit);
-      },
-      
-      setRecords: (records) => {
-        set({ records });
-      },
-      
-      clearRecords: () => {
-        set({ records: [] });
-      },
-      
-      deleteRecordsByStudentId: (studentId) => {
-        set((state) => ({
-          records: state.records.filter(r => r.studentId !== studentId)
-        }));
-      },
-    }),
-    {
-      name: 'classScore_scoreRecords',
-    }
-  )
+    getRecordsByStudentId: (studentId) =>
+      get().records
+        .filter(r => r.student_id === studentId)
+        .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()),
+
+    getRecordsByGroupId: (groupId) =>
+      get().records
+        .filter(r => r.group_id === groupId)
+        .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()),
+
+    getRecentRecords: (limit = 50) =>
+      [...get().records]
+        .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+        .slice(0, limit),
+
+    setRecords: (records) => set({ records }),
+
+    clearRecords: () => set({ records: [] }),
+  })
 );

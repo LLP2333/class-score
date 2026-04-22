@@ -31,8 +31,8 @@ export default function AnalysisPage() {
 
   // Statistics
   const stats = useMemo(() => {
-    const totalScore = students.reduce((sum, s) => sum + s.totalScore, 0);
-    const maxScore = students.length > 0 ? Math.max(...students.map(s => s.totalScore)) : 0;
+    const totalScore = students.reduce((sum, s) => sum + s.total_score, 0);
+    const maxScore = students.length > 0 ? Math.max(...students.map(s => s.total_score)) : 0;
     const avgScore = students.length > 0 ? Math.round(totalScore / students.length) : 0;
     return {
       studentCount: students.length,
@@ -58,7 +58,7 @@ export default function AnalysisPage() {
       weekEnd.setHours(23, 59, 59, 999);
       
       const weekRecords = records.filter(r => {
-        const date = new Date(r.createdAt);
+        const date = new Date(r.created_at);
         return date >= weekStart && date <= weekEnd;
       });
       
@@ -77,7 +77,7 @@ export default function AnalysisPage() {
     const distribution: Record<string, number> = {};
     
     records.forEach(record => {
-      const rule = rules.find(r => r.id === record.ruleId);
+      const rule = rules.find(r => r.id === record.rule_id);
       if (rule) {
         const category = rule.category;
         distribution[category] = (distribution[category] || 0) + Math.abs(record.score);
@@ -89,7 +89,7 @@ export default function AnalysisPage() {
 
   // Top students
   const topStudents = useMemo(() => 
-    [...students].sort((a, b) => b.totalScore - a.totalScore).slice(0, 10),
+    [...students].sort((a, b) => b.total_score - a.total_score).slice(0, 10),
     [students]
   );
 
@@ -110,7 +110,7 @@ export default function AnalysisPage() {
     labels: topStudents.map(s => s.name),
     datasets: [{
       label: '积分',
-      data: topStudents.map(s => s.totalScore),
+      data: topStudents.map(s => s.total_score),
       backgroundColor: [
         '#8B5CF6', '#EC4899', '#10B981', '#F59E0B', '#3B82F6',
         '#6366F1', '#14B8A6', '#F97316', '#EF4444', '#84CC16'
@@ -136,21 +136,21 @@ export default function AnalysisPage() {
     const studentsData = students.map((s, i) => ({
       '排名': i + 1,
       '姓名': s.name,
-      '积分': s.totalScore,
-      '小组': groups.find(g => g.id === s.groupId)?.name || '未分组',
+      '积分': s.total_score,
+      '小组': groups.find(g => g.id === s.group_id)?.name || '未分组',
     }));
     const wsStudents = XLSX.utils.json_to_sheet(studentsData);
     XLSX.utils.book_append_sheet(wb, wsStudents, '学生积分');
 
     // Records sheet
     const recordsData = records.map(r => {
-      const student = students.find(s => s.id === r.studentId);
-      const rule = rules.find(ru => ru.id === r.ruleId);
+      const student = students.find(s => s.id === r.student_id);
+      const rule = rules.find(ru => ru.id === r.rule_id);
       return {
         '学生': student?.name || '未知',
         '分值': r.score,
         '原因': r.reason || rule?.name || '-',
-        '时间': new Date(r.createdAt).toLocaleString('zh-CN'),
+        '时间': new Date(r.created_at).toLocaleString('zh-CN'),
       };
     });
     const wsRecords = XLSX.utils.json_to_sheet(recordsData);
@@ -158,8 +158,8 @@ export default function AnalysisPage() {
 
     // Groups sheet
     const groupsData = groups.map(g => {
-      const members = students.filter(s => s.groupId === g.id);
-      const totalScore = members.reduce((sum, s) => sum + s.totalScore, 0);
+      const members = students.filter(s => s.group_id === g.id);
+      const totalScore = members.reduce((sum, s) => sum + s.total_score, 0);
       return {
         '小组名': g.name,
         '成员数': members.length,

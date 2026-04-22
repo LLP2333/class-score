@@ -5,7 +5,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { useGroupStore, useStudentStore } from '@/store';
+import { useGroupStore, useStudentStore, useAuthStore } from '@/store';
 import { toast } from 'sonner';
 
 interface AddStudentModalProps {
@@ -17,30 +17,38 @@ interface AddStudentModalProps {
 export function AddStudentModal({ open, onClose, onSuccess }: AddStudentModalProps) {
   const { groups } = useGroupStore();
   const { addStudent } = useStudentStore();
+  const currentClassId = useAuthStore((s) => s.currentClassId);
   
   const [name, setName] = useState('');
   const [groupId, setGroupId] = useState<string>('');
-  const [score, setScore] = useState('0');
+  const [password, setPassword] = useState('123456');
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!name.trim()) {
       toast.error('请输入学生姓名');
       return;
     }
+    if (!currentClassId) {
+      toast.error('请先选择班级');
+      return;
+    }
 
-    addStudent({
+    const student = await addStudent(currentClassId, {
       name: name.trim(),
       avatar: Math.floor(Math.random() * 8) + 1,
-      groupId: groupId || null,
-      totalScore: parseInt(score) || 0,
+      group_id: groupId ? parseInt(groupId) : undefined,
+      password: password || '123456',
     });
 
-    toast.success('添加成功');
+    if (student) {
+      toast.success(`添加成功，账号: ${student.username || name.trim()}，密码: ${password || '123456'}`);
+    } else {
+      toast.error('添加失败');
+    }
     
-    // Reset form
     setName('');
     setGroupId('');
-    setScore('0');
+    setPassword('123456');
     
     onClose();
     onSuccess?.();
@@ -57,9 +65,18 @@ export function AddStudentModal({ open, onClose, onSuccess }: AddStudentModalPro
           <div>
             <label className="text-sm font-medium mb-2 block">学生姓名 *</label>
             <Input
-              placeholder="请输入学生姓名"
+              placeholder="请输入学生姓名（同时作为登录用户名）"
               value={name}
               onChange={(e) => setName(e.target.value)}
+            />
+          </div>
+
+          <div>
+            <label className="text-sm font-medium mb-2 block">初始密码</label>
+            <Input
+              placeholder="默认 123456"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
             />
           </div>
 
@@ -72,22 +89,12 @@ export function AddStudentModal({ open, onClose, onSuccess }: AddStudentModalPro
               <SelectContent>
                 <SelectItem value="__none__">未分组</SelectItem>
                 {groups.map((group) => (
-                  <SelectItem key={group.id} value={group.id}>
+                  <SelectItem key={group.id} value={String(group.id)}>
                     {group.name}
                   </SelectItem>
                 ))}
               </SelectContent>
             </Select>
-          </div>
-
-          <div>
-            <label className="text-sm font-medium mb-2 block">初始积分</label>
-            <Input
-              type="number"
-              min={0}
-              value={score}
-              onChange={(e) => setScore(e.target.value)}
-            />
           </div>
         </div>
 

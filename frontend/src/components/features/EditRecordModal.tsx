@@ -19,28 +19,28 @@ interface EditRecordModalProps {
 export function EditRecordModal({ record, open, onClose, onSuccess }: EditRecordModalProps) {
   const { rules } = useRuleStore();
   const { updateRecord } = useRecordStore();
-  const { getStudentById, updateStudent } = useStudentStore();
+  const { getStudentById } = useStudentStore();
 
   const [score, setScore] = useState('');
   const [reason, setReason] = useState('');
   const [ruleSearch, setRuleSearch] = useState('');
-  const [selectedRuleId, setSelectedRuleId] = useState<string | null>(null);
+  const [selectedRuleId, setSelectedRuleId] = useState<number | null>(null);
 
   useEffect(() => {
     if (record) {
       setScore(Math.abs(record.score).toString());
-      const rule = record.ruleId ? rules.find(r => r.id === record.ruleId) : null;
+      const rule = record.rule_id ? rules.find(r => r.id === record.rule_id) : null;
       setReason(rule?.name || record.reason || '');
-      setSelectedRuleId(record.ruleId);
+      setSelectedRuleId(record.rule_id);
     }
-  }, [record]);
+  }, [record, rules]);
 
   if (!record) return null;
 
-  const student = getStudentById(record.studentId);
+  const student = getStudentById(record.student_id);
   const isAdd = record.score > 0;
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     const newAbsScore = parseInt(score);
     if (!newAbsScore || newAbsScore <= 0) {
       toast.error('请输入有效的分值');
@@ -48,25 +48,20 @@ export function EditRecordModal({ record, open, onClose, onSuccess }: EditRecord
     }
 
     const newScore = isAdd ? Math.abs(newAbsScore) : -Math.abs(newAbsScore);
-    const scoreDiff = newScore - record.score;
 
-    updateRecord(record.id, {
+    const updated = await updateRecord(record.id, {
       score: newScore,
       reason: reason,
-      ruleId: selectedRuleId,
+      rule_id: selectedRuleId,
     });
 
-    if (student && scoreDiff !== 0) {
-      updateStudent(student.id, {
-        totalScore: student.totalScore + scoreDiff,
-      });
+    if (updated) {
+      toast.success('记录已修改');
+      setRuleSearch('');
+      setSelectedRuleId(null);
+      onClose();
+      onSuccess?.();
     }
-
-    toast.success('记录已修改');
-    setRuleSearch('');
-    setSelectedRuleId(null);
-    onClose();
-    onSuccess?.();
   };
 
   const allRules = rules.filter(r => r.type === (isAdd ? 'add' : 'minus'));
@@ -93,7 +88,7 @@ export function EditRecordModal({ record, open, onClose, onSuccess }: EditRecord
               <div>
                 <div className="font-semibold">{student.name}</div>
                 <div className="text-sm text-muted-foreground">
-                  当前总分: {student.totalScore}分
+                  当前总分: {student.total_score}分
                 </div>
               </div>
               <div className={cn(

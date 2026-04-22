@@ -1,76 +1,70 @@
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
-import type { Group } from '@/types';
-import { generateId } from '@/lib/utils';
+import { api } from '@/lib/api';
+import type { GroupData } from '@/lib/api';
 
 interface GroupStore {
-  groups: Group[];
-  
-  // Actions
-  addGroup: (data: Omit<Group, 'id' | 'createdAt'>) => Group;
-  updateGroup: (id: string, updates: Partial<Group>) => Group | null;
-  deleteGroup: (id: string) => void;
-  getGroupById: (id: string) => Group | undefined;
-  setGroups: (groups: Group[]) => void;
+  groups: GroupData[];
+  loading: boolean;
+
+  fetchGroups: (classId: number) => Promise<void>;
+  addGroup: (classId: number, data: { name: string; color?: number; leader_id?: number | null }) => Promise<GroupData | null>;
+  updateGroup: (id: number, updates: { name?: string; color?: number; leader_id?: number | null }) => Promise<GroupData | null>;
+  deleteGroup: (id: number) => Promise<boolean>;
+  getGroupById: (id: number) => GroupData | undefined;
+  setGroups: (groups: GroupData[]) => void;
   clearGroups: () => void;
 }
 
 export const useGroupStore = create<GroupStore>()(
-  persist(
-    (set, get) => ({
-      groups: [],
-      
-      addGroup: (data) => {
-        const groups = get().groups;
-        const existingColors = groups.map(g => g.color);
-        let color = data.color || 1;
-        while (existingColors.includes(color) && color <= 8) {
-          color++;
-        }
-        
-        const newGroup: Group = {
-          id: generateId(),
-          createdAt: new Date().toISOString(),
-          name: data.name,
-          color: color,
-          leaderId: data.leaderId || null,
-        };
-        set((state) => ({ groups: [...state.groups, newGroup] }));
-        return newGroup;
-      },
-      
-      updateGroup: (id, updates) => {
-        const groups = get().groups;
-        const index = groups.findIndex(g => g.id === id);
-        if (index === -1) return null;
-        
-        const updatedGroup = { ...groups[index], ...updates };
-        const newGroups = [...groups];
-        newGroups[index] = updatedGroup;
-        set({ groups: newGroups });
-        return updatedGroup;
-      },
-      
-      deleteGroup: (id) => {
+  (set, get) => ({
+    groups: [],
+    loading: false,
+
+    fetchGroups: async (classId) => {
+      set({ loading: true });
+      const result = await api.listGroups(classId);
+      if (result.success && result.data) {
+        set({ groups: result.data });
+      }
+      set({ loading: false });
+    },
+
+    addGroup: async (classId, data) => {
+      const result = await api.createGroup(classId, data);
+      if (result.success && result.data) {
+        set((state) => ({ groups: [...state.groups, result.data!] }));
+        return result.data;
+      }
+      return null;
+    },
+
+    updateGroup: async (id, updates) => {
+      const result = await api.updateGroup(id, updates);
+      if (result.success && result.data) {
+        const updated = result.data;
         set((state) => ({
-          groups: state.groups.filter(g => g.id !== id)
+          groups: state.groups.map(g => g.id === id ? updated : g),
         }));
-      },
-      
-      getGroupById: (id) => {
-        return get().groups.find(g => g.id === id);
-      },
-      
-      setGroups: (groups) => {
-        set({ groups });
-      },
-      
-      clearGroups: () => {
-        set({ groups: [] });
-      },
-    }),
-    {
-      name: 'classScore_groups',
-    }
-  )
+        return updated;
+      }
+      return null;
+    },
+
+    deleteGroup: async (id) => {
+      const result = await api.deleteGroup(id);
+      if (result.success) {
+        set((state) => ({
+          groups: state.groups.filter(g => g.id !== id),
+        }));
+        return true;
+      }
+      return false;
+    },
+
+    getGroupById: (id) => get().groups.find(g => g.id === id),
+
+    setGroups: (groups) => set({ groups }),
+
+    clearGroups: () => set({ groups: [] }),
+  })
 );

@@ -5,6 +5,7 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"time"
 
 	"classScore-backend/internal/config"
 	"classScore-backend/internal/handler"
@@ -40,9 +41,7 @@ func main() {
 	}
 	defer sqliteStore.Close()
 
-	fileStore := store.NewFileStore(cfg.GetUserdataPath())
-
-	h := handler.NewHandler(cfg, sqliteStore, fileStore)
+	h := handler.NewHandler(cfg, sqliteStore)
 
 	r := gin.Default()
 
@@ -60,7 +59,9 @@ func main() {
 		},
 		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
 		AllowHeaders:     []string{"Content-Type", "Authorization"},
+		ExposeHeaders:    []string{"Content-Length", "Content-Type"},
 		AllowCredentials: true,
+		MaxAge:           12 * time.Hour,
 	}))
 
 	api := r.Group("/api")
@@ -73,9 +74,82 @@ func main() {
 		authorized.Use(h.AuthMiddleware())
 		{
 			authorized.POST("/change-password", h.ChangePassword)
-			authorized.GET("/sync/meta", h.SyncMeta)
-			authorized.POST("/sync/upload", h.SyncUpload)
-			authorized.GET("/sync/download", h.SyncDownload)
+
+			// Teacher-only routes
+			teacher := authorized.Group("")
+			teacher.Use(h.TeacherOnly())
+			{
+				// Classes
+				teacher.GET("/classes", h.ListClasses)
+				teacher.POST("/classes", h.CreateClass)
+				teacher.PUT("/classes/:id", h.UpdateClass)
+				teacher.DELETE("/classes/:id", h.DeleteClass)
+
+				// Students (write)
+				teacher.POST("/classes/:id/students", h.CreateStudent)
+				teacher.PUT("/students/:id", h.UpdateStudent)
+				teacher.DELETE("/students/:id", h.DeleteStudent)
+				teacher.POST("/students/:id/reset-password", h.ResetStudentPassword)
+
+				// Groups (write)
+				teacher.POST("/classes/:id/groups", h.CreateGroup)
+				teacher.PUT("/groups/:id", h.UpdateGroup)
+				teacher.DELETE("/groups/:id", h.DeleteGroup)
+
+				// Rules (write)
+				teacher.POST("/classes/:id/rules", h.CreateRule)
+				teacher.PUT("/rules/:id", h.UpdateRule)
+				teacher.DELETE("/rules/:id", h.DeleteRule)
+
+				// Records (write)
+				teacher.POST("/classes/:id/records", h.CreateRecord)
+				teacher.PUT("/records/:id", h.UpdateRecord)
+				teacher.DELETE("/records/:id", h.DeleteRecord)
+
+				// Products (write)
+				teacher.POST("/classes/:id/products", h.CreateProduct)
+				teacher.PUT("/products/:id", h.UpdateProduct)
+				teacher.DELETE("/products/:id", h.DeleteProduct)
+
+				// Exchanges (write)
+				teacher.POST("/classes/:id/exchanges", h.CreateExchange)
+
+				// Pets (write)
+				teacher.POST("/classes/:id/pet-species", h.CreatePetSpecies)
+				teacher.PUT("/pet-species/:id", h.UpdatePetSpecies)
+				teacher.DELETE("/pet-species/:id", h.DeletePetSpecies)
+				teacher.POST("/classes/:id/student-pets", h.AssignPet)
+				teacher.DELETE("/student-pets/:studentId", h.RemoveStudentPet)
+				teacher.PUT("/classes/:id/pet-config", h.UpdatePetConfig)
+
+				// Settings (write)
+				teacher.PUT("/classes/:id/settings", h.UpdateSettings)
+
+				// Roll call (write)
+				teacher.POST("/classes/:id/roll-calls", h.CreateRollCallRecord)
+
+				// Migration
+				teacher.GET("/migrate/check", h.CheckLegacyData)
+				teacher.POST("/migrate/legacy", h.MigrateFromLegacy)
+				teacher.POST("/migrate/import", h.MigrateFromUpload)
+			}
+
+			// Read-only routes (both teacher and student)
+			authorized.GET("/classes/:id", h.GetClass)
+			authorized.GET("/classes/:id/students", h.ListStudents)
+			authorized.GET("/classes/:id/groups", h.ListGroups)
+			authorized.GET("/classes/:id/rules", h.ListRules)
+			authorized.GET("/classes/:id/records", h.ListRecords)
+			authorized.GET("/classes/:id/products", h.ListProducts)
+			authorized.GET("/classes/:id/exchanges", h.ListExchanges)
+			authorized.GET("/classes/:id/pet-species", h.ListPetSpecies)
+			authorized.GET("/classes/:id/student-pets", h.ListStudentPets)
+			authorized.GET("/classes/:id/pet-config", h.GetPetConfig)
+			authorized.GET("/classes/:id/settings", h.GetSettings)
+			authorized.GET("/classes/:id/roll-calls", h.ListRollCallRecords)
+
+			// Student-specific
+			authorized.GET("/student/profile", h.GetStudentProfile)
 		}
 	}
 

@@ -78,14 +78,14 @@ export default function RankingPage() {
   const studentScoreMap = useMemo(() => {
     const { start, end } = activeDateRange;
     if (!start) {
-      return new Map(students.map(s => [s.id, s.totalScore]));
+      return new Map(students.map(s => [s.id, s.total_score]));
     }
-    const map = new Map<string, number>();
+    const map = new Map<number, number>();
     students.forEach(s => map.set(s.id, 0));
     records.forEach(r => {
-      const t = new Date(r.createdAt);
-      if (t >= start && (!end || t <= end) && map.has(r.studentId)) {
-        map.set(r.studentId, (map.get(r.studentId) || 0) + r.score);
+      const t = new Date(r.created_at);
+      if (t >= start && (!end || t <= end) && map.has(r.student_id)) {
+        map.set(r.student_id, (map.get(r.student_id) || 0) + r.score);
       }
     });
     return map;
@@ -103,7 +103,7 @@ export default function RankingPage() {
 
   const groupsWithScore = useMemo(() => {
     return groups.map(g => {
-      const members = students.filter(s => s.groupId === g.id);
+      const members = students.filter(s => s.group_id === g.id);
       const totalScore = members.reduce((sum, m) => sum + (studentScoreMap.get(m.id) || 0), 0);
       return {
         ...g,

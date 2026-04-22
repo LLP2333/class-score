@@ -1,75 +1,73 @@
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
-import type { Student } from '@/types';
-import { generateId } from '@/lib/utils';
+import { api } from '@/lib/api';
+import type { StudentData } from '@/lib/api';
 
 interface StudentStore {
-  students: Student[];
-  
-  // Actions
-  addStudent: (data: Omit<Student, 'id' | 'createdAt'>) => Student;
-  updateStudent: (id: string, updates: Partial<Student>) => Student | null;
-  deleteStudent: (id: string) => void;
-  getStudentById: (id: string) => Student | undefined;
-  getStudentsByGroupId: (groupId: string) => Student[];
-  setStudents: (students: Student[]) => void;
+  students: StudentData[];
+  loading: boolean;
+
+  fetchStudents: (classId: number) => Promise<void>;
+  addStudent: (classId: number, data: { name: string; avatar?: number; group_id?: number | null; password?: string }) => Promise<StudentData | null>;
+  updateStudent: (id: number, updates: { name?: string; avatar?: number; group_id?: number | null }) => Promise<StudentData | null>;
+  deleteStudent: (id: number) => Promise<boolean>;
+  getStudentById: (id: number) => StudentData | undefined;
+  getStudentsByGroupId: (groupId: number) => StudentData[];
+  setStudents: (students: StudentData[]) => void;
   clearStudents: () => void;
 }
 
 export const useStudentStore = create<StudentStore>()(
-  persist(
-    (set, get) => ({
-      students: [],
-      
-      addStudent: (data) => {
-        const newStudent: Student = {
-          id: generateId(),
-          createdAt: new Date().toISOString(),
-          name: data.name,
-          avatar: data.avatar || Math.floor(Math.random() * 8) + 1,
-          groupId: data.groupId || null,
-          totalScore: data.totalScore || 0,
-        };
-        set((state) => ({ students: [...state.students, newStudent] }));
-        return newStudent;
-      },
-      
-      updateStudent: (id, updates) => {
-        const students = get().students;
-        const index = students.findIndex(s => s.id === id);
-        if (index === -1) return null;
-        
-        const updatedStudent = { ...students[index], ...updates };
-        const newStudents = [...students];
-        newStudents[index] = updatedStudent;
-        set({ students: newStudents });
-        return updatedStudent;
-      },
-      
-      deleteStudent: (id) => {
+  (set, get) => ({
+    students: [],
+    loading: false,
+
+    fetchStudents: async (classId) => {
+      set({ loading: true });
+      const result = await api.listStudents(classId);
+      if (result.success && result.data) {
+        set({ students: result.data });
+      }
+      set({ loading: false });
+    },
+
+    addStudent: async (classId, data) => {
+      const result = await api.createStudent(classId, data);
+      if (result.success && result.data) {
+        set((state) => ({ students: [...state.students, result.data!] }));
+        return result.data;
+      }
+      return null;
+    },
+
+    updateStudent: async (id, updates) => {
+      const result = await api.updateStudent(id, updates);
+      if (result.success && result.data) {
+        const updated = result.data;
         set((state) => ({
-          students: state.students.filter(s => s.id !== id)
+          students: state.students.map(s => s.id === id ? updated : s),
         }));
-      },
-      
-      getStudentById: (id) => {
-        return get().students.find(s => s.id === id);
-      },
-      
-      getStudentsByGroupId: (groupId) => {
-        return get().students.filter(s => s.groupId === groupId);
-      },
-      
-      setStudents: (students) => {
-        set({ students });
-      },
-      
-      clearStudents: () => {
-        set({ students: [] });
-      },
-    }),
-    {
-      name: 'classScore_students',
-    }
-  )
+        return updated;
+      }
+      return null;
+    },
+
+    deleteStudent: async (id) => {
+      const result = await api.deleteStudent(id);
+      if (result.success) {
+        set((state) => ({
+          students: state.students.filter(s => s.id !== id),
+        }));
+        return true;
+      }
+      return false;
+    },
+
+    getStudentById: (id) => get().students.find(s => s.id === id),
+
+    getStudentsByGroupId: (groupId) => get().students.filter(s => s.group_id === groupId),
+
+    setStudents: (students) => set({ students }),
+
+    clearStudents: () => set({ students: [] }),
+  })
 );

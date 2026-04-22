@@ -2,7 +2,7 @@
 
 import { usePathname } from 'next/navigation';
 import { Button } from '@/components/ui/button';
-import { Menu, RefreshCw } from 'lucide-react';
+import { Menu } from 'lucide-react';
 
 const pageTitles: Record<string, string> = {
   '/': '首页',
@@ -12,16 +12,16 @@ const pageTitles: Record<string, string> = {
   '/analysis': '数据分析',
   '/shop': '积分商城',
   '/rules': '积分规则',
+  '/pets': '宠物乐园',
   '/tools': '工具箱',
   '/settings': '系统设置',
 };
 
 interface HeaderProps {
   onMenuClick: () => void;
-  onRefresh?: () => void;
 }
 
-export function Header({ onMenuClick, onRefresh }: HeaderProps) {
+export function Header({ onMenuClick }: HeaderProps) {
   const pathname = usePathname();
   const title = pageTitles[pathname] || '首页';
 
@@ -37,19 +37,6 @@ export function Header({ onMenuClick, onRefresh }: HeaderProps) {
           <Menu className="h-5 w-5" />
         </Button>
         <h1 className="text-xl font-semibold">{title}</h1>
-      </div>
-      
-      <div className="flex items-center gap-2">
-        {onRefresh && (
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={onRefresh}
-            title="刷新"
-          >
-            <RefreshCw className="h-4 w-4" />
-          </Button>
-        )}
       </div>
     </header>
   );

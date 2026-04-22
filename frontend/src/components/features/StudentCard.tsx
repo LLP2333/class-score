@@ -17,9 +17,9 @@ interface StudentCardProps {
 export function StudentCard({ student, onAddScore, onMinusScore, onClick }: StudentCardProps) {
   const { config, getStudentPet, getPetStage, getPetSpecies } = usePetStore();
   const pet = getStudentPet(student.id);
-  const stage = pet ? getPetStage(student.id, student.totalScore) : null;
-  const species = pet ? getPetSpecies(pet.speciesId) : null;
-  const showPet = config.enabled && config.showOnStudentCard && pet;
+  const stage = pet ? getPetStage(student.id, student.total_score) : null;
+  const species = pet ? getPetSpecies(pet.species_id) : null;
+  const showPet = config?.enabled && config?.show_on_student_card && pet;
 
   return (
     <div
@@ -30,7 +30,6 @@ export function StudentCard({ student, onAddScore, onMinusScore, onClick }: Stud
       )}
       onClick={onClick}
     >
-      {/* Avatar with pet */}
       <div className="relative">
         <div
           className={cn(
@@ -48,35 +47,38 @@ export function StudentCard({ student, onAddScore, onMinusScore, onClick }: Stud
         )}
       </div>
       
-      {/* Name */}
       <div className="text-sm font-medium text-foreground truncate w-full text-center" title={student.name}>
         {student.name}
       </div>
       
-      {/* Score */}
       <div className="text-lg font-bold text-primary">
-        {student.totalScore}分
+        {student.total_score}分
       </div>
       
-      {/* Actions */}
-      <div className="flex gap-2 w-full" onClick={(e) => e.stopPropagation()}>
-        <Button
-          variant="outline"
-          size="sm"
-          className="flex-1 h-8 text-green-600 border-green-200 hover:bg-green-50 hover:text-green-700"
-          onClick={onAddScore}
-        >
-          <Plus className="h-4 w-4" />
-        </Button>
-        <Button
-          variant="outline"
-          size="sm"
-          className="flex-1 h-8 text-red-600 border-red-200 hover:bg-red-50 hover:text-red-700"
-          onClick={onMinusScore}
-        >
-          <Minus className="h-4 w-4" />
-        </Button>
-      </div>
+      {(onAddScore || onMinusScore) && (
+        <div className="flex gap-2 w-full" onClick={(e) => e.stopPropagation()}>
+          {onAddScore && (
+            <Button
+              variant="outline"
+              size="sm"
+              className="flex-1 h-8 text-green-600 border-green-200 hover:bg-green-50 hover:text-green-700"
+              onClick={onAddScore}
+            >
+              <Plus className="h-4 w-4" />
+            </Button>
+          )}
+          {onMinusScore && (
+            <Button
+              variant="outline"
+              size="sm"
+              className="flex-1 h-8 text-red-600 border-red-200 hover:bg-red-50 hover:text-red-700"
+              onClick={onMinusScore}
+            >
+              <Minus className="h-4 w-4" />
+            </Button>
+          )}
+        </div>
+      )}
     </div>
   );
 }

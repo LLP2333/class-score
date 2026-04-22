@@ -9,9 +9,9 @@ import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { cn, getAvatarClass, formatRelativeTime } from '@/lib/utils';
 import type { Student, ScoreRecord } from '@/types';
-import { useGroupStore, useStudentStore, useRecordStore, useRuleStore } from '@/store';
+import { useGroupStore, useStudentStore, useRecordStore, useRuleStore, useAuthStore } from '@/store';
 import { usePetStore } from '@/store/usePetStore';
-import { PetDisplay, PetEvolutionPreview } from '@/components/features/PetDisplay';
+import { PetDisplay } from '@/components/features/PetDisplay';
 import { EditRecordModal } from '@/components/features/EditRecordModal';
 import { toast } from 'sonner';
 
@@ -25,67 +25,64 @@ interface StudentDetailModalProps {
 export function StudentDetailModal({ student: studentProp, open, onClose, onUpdate }: StudentDetailModalProps) {
   const { groups, getGroupById } = useGroupStore();
   const { getStudentById, updateStudent, deleteStudent } = useStudentStore();
-  const { getRecordsByStudentId, deleteRecordsByStudentId, deleteRecord } = useRecordStore();
+  const { getRecordsByStudentId, deleteRecord } = useRecordStore();
   const { getRuleById } = useRuleStore();
   const { config: petConfig, getStudentPet, getPetStage, getPetSpecies } = usePetStore();
+  const isTeacher = useAuthStore((s) => s.role === 'teacher');
   
   const [isEditing, setIsEditing] = useState(false);
   const [editName, setEditName] = useState('');
   const [editGroupId, setEditGroupId] = useState('');
-  const [editScore, setEditScore] = useState('');
   const [editingRecord, setEditingRecord] = useState<ScoreRecord | null>(null);
 
   const student = studentProp ? getStudentById(studentProp.id) ?? studentProp : null;
 
-  const handleDeleteRecord = (record: ScoreRecord) => {
+  const handleDeleteRecord = async (record: ScoreRecord) => {
     if (!confirm('确定要删除这条积分记录吗？学生总分将自动调整。')) return;
-    const currentStudent = student ? getStudentById(student.id) : null;
-    deleteRecord(record.id);
-    if (currentStudent) {
-      updateStudent(currentStudent.id, {
-        totalScore: currentStudent.totalScore - record.score,
-      });
+    const deleted = await deleteRecord(record.id);
+    if (deleted) {
+      toast.success('记录已删除，总分已调整');
+      onUpdate?.();
     }
-    toast.success('记录已删除，总分已调整');
-    onUpdate?.();
   };
 
   if (!student) return null;
 
   const records = getRecordsByStudentId(student.id).slice(0, 10);
-  const group = student.groupId ? getGroupById(student.groupId) : null;
+  const group = student.group_id ? getGroupById(student.group_id) : null;
 
   const handleEdit = () => {
     setEditName(student.name);
-    setEditGroupId(student.groupId || '');
-    setEditScore(student.totalScore.toString());
+    setEditGroupId(student.group_id ? String(student.group_id) : '');
     setIsEditing(true);
   };
 
-  const handleSaveEdit = () => {
+  const handleSaveEdit = async () => {
     if (!editName.trim()) {
       toast.error('请输入学生姓名');
       return;
     }
 
-    updateStudent(student.id, {
+    const updated = await updateStudent(student.id, {
       name: editName.trim(),
-      groupId: editGroupId || null,
-      totalScore: parseInt(editScore) || 0,
+      group_id: editGroupId ? parseInt(editGroupId) : null,
     });
 
-    toast.success('保存成功');
-    setIsEditing(false);
-    onUpdate?.();
+    if (updated) {
+      toast.success('保存成功');
+      setIsEditing(false);
+      onUpdate?.();
+    }
   };
 
-  const handleDelete = () => {
+  const handleDelete = async () => {
     if (confirm(`确定要删除学生"${student.name}"吗？此操作不可撤销。`)) {
-      deleteStudent(student.id);
-      deleteRecordsByStudentId(student.id);
-      toast.success('删除成功');
-      onClose();
-      onUpdate?.();
+      const success = await deleteStudent(student.id);
+      if (success) {
+        toast.success('删除成功');
+        onClose();
+        onUpdate?.();
+      }
     }
   };
 
@@ -115,21 +112,12 @@ export function StudentDetailModal({ student: studentProp, open, onClose, onUpda
                 <SelectContent>
                   <SelectItem value="__none__">未分组</SelectItem>
                   {groups.map((g) => (
-                    <SelectItem key={g.id} value={g.id}>
+                    <SelectItem key={g.id} value={String(g.id)}>
                       {g.name}
                     </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
-            </div>
-
-            <div>
-              <label className="text-sm font-medium mb-2 block">当前积分</label>
-              <Input
-                type="number"
-                value={editScore}
-                onChange={(e) => setEditScore(e.target.value)}
-              />
             </div>
           </div>
 
@@ -150,7 +138,6 @@ export function StudentDetailModal({ student: studentProp, open, onClose, onUpda
         </DialogHeader>
         
         <div className="space-y-4">
-          {/* Student info */}
           <div className="flex flex-col items-center gap-2">
             <div
               className={cn(
@@ -162,15 +149,14 @@ export function StudentDetailModal({ student: studentProp, open, onClose, onUpda
               {student.name.charAt(0)}
             </div>
             <div className="text-lg font-semibold">{student.name}</div>
-            <div className="text-2xl font-bold text-primary">{student.totalScore}分</div>
+            <div className="text-2xl font-bold text-primary">{student.total_score}分</div>
             {group && <Badge variant="secondary">{group.name}</Badge>}
           </div>
 
-          {/* Pet info */}
-          {petConfig.enabled && (() => {
+          {petConfig?.enabled && (() => {
             const pet = getStudentPet(student.id);
-            const stage = pet ? getPetStage(student.id, student.totalScore) : null;
-            const sp = pet ? getPetSpecies(pet.speciesId) : null;
+            const stage = pet ? getPetStage(student.id, student.total_score) : null;
+            const sp = pet ? getPetSpecies(pet.species_id) : null;
             if (!pet || !stage || !sp) return null;
 
             const nextStage = sp.stages.find((s) => s.level === stage.level + 1);
@@ -189,7 +175,7 @@ export function StudentDetailModal({ student: studentProp, open, onClose, onUpda
                     <div className="ml-auto text-right">
                       <div className="text-xs text-muted-foreground">下次进化</div>
                       <div className="text-sm font-semibold text-primary">
-                        还需{nextStage.minScore - student.totalScore}分
+                        还需{nextStage.min_score - student.total_score}分
                       </div>
                     </div>
                   )}
@@ -198,14 +184,13 @@ export function StudentDetailModal({ student: studentProp, open, onClose, onUpda
             );
           })()}
 
-          {/* Recent records */}
           <div>
             <h4 className="text-sm font-medium mb-2">最近记录</h4>
             {records.length > 0 ? (
               <ScrollArea className="h-48">
                 <div className="space-y-2">
                   {records.map((record) => {
-                    const rule = record.ruleId ? getRuleById(record.ruleId) : null;
+                    const rule = record.rule_id ? getRuleById(record.rule_id) : null;
                     return (
                       <div
                         key={record.id}
@@ -227,28 +212,30 @@ export function StudentDetailModal({ student: studentProp, open, onClose, onUpda
                             {record.score >= 0 ? '+' : ''}{record.score}
                           </span>
                           <span className="text-xs text-muted-foreground">
-                            {formatRelativeTime(record.createdAt)}
+                            {formatRelativeTime(record.created_at)}
                           </span>
-                          <div className="hidden group-hover:flex items-center gap-0.5">
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              className="h-6 w-6 p-0 text-xs"
-                              onClick={() => setEditingRecord(record)}
-                              title="编辑"
-                            >
-                              ✏️
-                            </Button>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              className="h-6 w-6 p-0 text-xs"
-                              onClick={() => handleDeleteRecord(record)}
-                              title="删除"
-                            >
-                              🗑️
-                            </Button>
-                          </div>
+                          {isTeacher && (
+                            <div className="hidden group-hover:flex items-center gap-0.5">
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                className="h-6 w-6 p-0 text-xs"
+                                onClick={() => setEditingRecord(record)}
+                                title="编辑"
+                              >
+                                ✏️
+                              </Button>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                className="h-6 w-6 p-0 text-xs"
+                                onClick={() => handleDeleteRecord(record)}
+                                title="删除"
+                              >
+                                🗑️
+                              </Button>
+                            </div>
+                          )}
                         </div>
                       </div>
                     );
@@ -262,18 +249,24 @@ export function StudentDetailModal({ student: studentProp, open, onClose, onUpda
         </div>
 
         <DialogFooter>
-          <Button variant="outline" onClick={handleEdit}>编辑</Button>
-          <Button variant="destructive" onClick={handleDelete}>删除</Button>
+          {isTeacher && (
+            <>
+              <Button variant="outline" onClick={handleEdit}>编辑</Button>
+              <Button variant="destructive" onClick={handleDelete}>删除</Button>
+            </>
+          )}
           <Button onClick={onClose}>关闭</Button>
         </DialogFooter>
       </DialogContent>
 
-      <EditRecordModal
-        record={editingRecord}
-        open={!!editingRecord}
-        onClose={() => setEditingRecord(null)}
-        onSuccess={onUpdate}
-      />
+      {isTeacher && (
+        <EditRecordModal
+          record={editingRecord}
+          open={!!editingRecord}
+          onClose={() => setEditingRecord(null)}
+          onSuccess={onUpdate}
+        />
+      )}
     </Dialog>
   );
 }

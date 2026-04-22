@@ -11,7 +11,7 @@ import {
   DropdownMenuItem,
 } from '@/components/ui/dropdown-menu';
 import { Input } from '@/components/ui/input';
-import { useRecordStore, useStudentStore, useRuleStore, useGroupStore } from '@/store';
+import { useRecordStore, useStudentStore, useRuleStore, useGroupStore, useAuthStore } from '@/store';
 import { cn, getAvatarClass } from '@/lib/utils';
 import { EditRecordModal } from '@/components/features/EditRecordModal';
 import type { ScoreRecord } from '@/types';
@@ -21,24 +21,21 @@ type FilterType = 'all' | 'add' | 'minus';
 
 export default function TimelinePage() {
   const { records, deleteRecord } = useRecordStore();
-  const { students, getStudentById, updateStudent } = useStudentStore();
+  const { students, getStudentById } = useStudentStore();
   const { getRuleById } = useRuleStore();
   const { getGroupById } = useGroupStore();
+  const isTeacher = useAuthStore((s) => s.role === 'teacher');
   
   const [filter, setFilter] = useState<FilterType>('all');
   const [searchName, setSearchName] = useState('');
   const [editingRecord, setEditingRecord] = useState<ScoreRecord | null>(null);
 
-  const handleDeleteRecord = (record: ScoreRecord) => {
+  const handleDeleteRecord = async (record: ScoreRecord) => {
     if (!confirm('确定要删除这条积分记录吗？学生总分将自动调整。')) return;
-    const student = getStudentById(record.studentId);
-    deleteRecord(record.id);
-    if (student) {
-      updateStudent(student.id, {
-        totalScore: student.totalScore - record.score,
-      });
+    const deleted = await deleteRecord(record.id);
+    if (deleted) {
+      toast.success('记录已删除，总分已调整');
     }
-    toast.success('记录已删除，总分已调整');
   };
 
   const matchedStudentIds = useMemo(() => {
@@ -53,7 +50,7 @@ export default function TimelinePage() {
     let result = [...records];
     
     if (matchedStudentIds) {
-      result = result.filter(r => matchedStudentIds.has(r.studentId));
+      result = result.filter(r => matchedStudentIds.has(r.student_id));
     }
 
     if (filter === 'add') {
@@ -63,7 +60,7 @@ export default function TimelinePage() {
     }
     
     return result.sort((a, b) => 
-      new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+      new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
     );
   }, [records, filter, matchedStudentIds]);
 
@@ -72,7 +69,7 @@ export default function TimelinePage() {
     const groups: Record<string, typeof filteredRecords> = {};
     
     filteredRecords.forEach(record => {
-      const date = new Date(record.createdAt).toLocaleDateString('zh-CN', {
+      const date = new Date(record.created_at).toLocaleDateString('zh-CN', {
         year: 'numeric',
         month: 'long',
         day: 'numeric'
@@ -129,9 +126,9 @@ export default function TimelinePage() {
               {/* Records for this date */}
               <div className="relative ml-4 pl-6 border-l-2 border-muted space-y-3 mt-3">
                 {dayRecords.map((record) => {
-                  const student = getStudentById(record.studentId);
-                  const rule = record.ruleId ? getRuleById(record.ruleId) : null;
-                  const group = student?.groupId ? getGroupById(student.groupId) : null;
+                  const student = getStudentById(record.student_id);
+                  const rule = record.rule_id ? getRuleById(record.rule_id) : null;
+                  const group = student?.group_id ? getGroupById(student.group_id) : null;
                   
                   return (
                     <div key={record.id} className="relative">
@@ -187,30 +184,32 @@ export default function TimelinePage() {
                                   {record.score > 0 ? '+' : ''}{record.score}
                                 </div>
                                 <div className="text-xs text-muted-foreground">
-                                  {new Date(record.createdAt).toLocaleTimeString('zh-CN', {
+                                  {new Date(record.created_at).toLocaleTimeString('zh-CN', {
                                     hour: '2-digit',
                                     minute: '2-digit'
                                   })}
                                 </div>
                               </div>
-                              <DropdownMenu>
-                                <DropdownMenuTrigger asChild>
-                                  <Button variant="ghost" size="sm" className="h-7 w-7 p-0">
-                                    <span className="text-sm">⋮</span>
-                                  </Button>
-                                </DropdownMenuTrigger>
-                                <DropdownMenuContent align="end">
-                                  <DropdownMenuItem onClick={() => setEditingRecord(record)}>
-                                    ✏️ 编辑记录
-                                  </DropdownMenuItem>
-                                  <DropdownMenuItem
-                                    variant="destructive"
-                                    onClick={() => handleDeleteRecord(record)}
-                                  >
-                                    🗑️ 删除记录
-                                  </DropdownMenuItem>
-                                </DropdownMenuContent>
-                              </DropdownMenu>
+                              {isTeacher && (
+                                <DropdownMenu>
+                                  <DropdownMenuTrigger asChild>
+                                    <Button variant="ghost" size="sm" className="h-7 w-7 p-0">
+                                      <span className="text-sm">⋮</span>
+                                    </Button>
+                                  </DropdownMenuTrigger>
+                                  <DropdownMenuContent align="end">
+                                    <DropdownMenuItem onClick={() => setEditingRecord(record)}>
+                                      ✏️ 编辑记录
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem
+                                      variant="destructive"
+                                      onClick={() => handleDeleteRecord(record)}
+                                    >
+                                      🗑️ 删除记录
+                                    </DropdownMenuItem>
+                                  </DropdownMenuContent>
+                                </DropdownMenu>
+                              )}
                             </div>
                           </div>
                         </CardContent>

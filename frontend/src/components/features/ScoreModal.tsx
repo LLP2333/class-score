@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { cn, getAvatarClass } from '@/lib/utils';
 import type { Student, Rule } from '@/types';
-import { useRuleStore, useRecordStore, useStudentStore } from '@/store';
+import { useRuleStore, useRecordStore, useAuthStore } from '@/store';
 import { toast } from 'sonner';
 
 interface ScoreModalProps {
@@ -20,9 +20,9 @@ interface ScoreModalProps {
 export function ScoreModal({ student, action, open, onClose, onSuccess }: ScoreModalProps) {
   const { rules } = useRuleStore();
   const { addRecord } = useRecordStore();
-  const { updateStudent } = useStudentStore();
+  const currentClassId = useAuthStore((s) => s.currentClassId);
   
-  const [selectedRuleId, setSelectedRuleId] = useState<string | null>(null);
+  const [selectedRuleId, setSelectedRuleId] = useState<number | null>(null);
   const [selectedScore, setSelectedScore] = useState(0);
   const [customScore, setCustomScore] = useState('');
   const [reason, setReason] = useState('');
@@ -38,8 +38,8 @@ export function ScoreModal({ student, action, open, onClose, onSuccess }: ScoreM
     setCustomScore('');
   };
 
-  const handleSubmit = () => {
-    if (!student) return;
+  const handleSubmit = async () => {
+    if (!student || !currentClassId) return;
     
     const finalScore = customScore ? parseInt(customScore) : selectedScore;
     if (!finalScore) {
@@ -50,23 +50,20 @@ export function ScoreModal({ student, action, open, onClose, onSuccess }: ScoreM
     const scoreValue = action === 'minus' ? -Math.abs(finalScore) : Math.abs(finalScore);
     const selectedRule = selectedRuleId ? rules.find(r => r.id === selectedRuleId) : null;
 
-    // Add record
-    addRecord({
-      studentId: student.id,
-      groupId: student.groupId,
-      ruleId: selectedRuleId,
+    const record = await addRecord(currentClassId, {
+      student_id: student.id,
+      group_id: student.group_id,
+      rule_id: selectedRuleId,
       score: scoreValue,
       reason: reason || selectedRule?.name || (action === 'add' ? '加分' : '扣分'),
     });
-    
-    // Update student score
-    updateStudent(student.id, {
-      totalScore: student.totalScore + scoreValue,
-    });
 
-    toast.success(`${action === 'add' ? '加' : '扣'}分成功: ${action === 'add' ? '+' : ''}${scoreValue}分`);
+    if (record) {
+      toast.success(`${action === 'add' ? '加' : '扣'}分成功: ${action === 'add' ? '+' : ''}${scoreValue}分`);
+    } else {
+      toast.error('操作失败');
+    }
     
-    // Reset state
     setSelectedRuleId(null);
     setSelectedScore(0);
     setCustomScore('');
@@ -87,7 +84,6 @@ export function ScoreModal({ student, action, open, onClose, onSuccess }: ScoreM
         </DialogHeader>
         
         <div className="space-y-4">
-          {/* Student info */}
           <div className="flex flex-col items-center gap-2">
             <div
               className={cn(
@@ -99,10 +95,9 @@ export function ScoreModal({ student, action, open, onClose, onSuccess }: ScoreM
               {student.name.charAt(0)}
             </div>
             <div className="text-lg font-semibold">{student.name}</div>
-            <div className="text-muted-foreground">当前积分: {student.totalScore}分</div>
+            <div className="text-muted-foreground">当前积分: {student.total_score}分</div>
           </div>
 
-          {/* Rule quick select */}
           <div>
             <div className="flex items-center gap-2 mb-2">
               <label className="text-sm font-medium whitespace-nowrap">
@@ -137,7 +132,6 @@ export function ScoreModal({ student, action, open, onClose, onSuccess }: ScoreM
             </div>
           </div>
 
-          {/* Custom score */}
           <div>
             <label className="text-sm font-medium mb-2 block">自定义分值</label>
             <Input
@@ -153,7 +147,6 @@ export function ScoreModal({ student, action, open, onClose, onSuccess }: ScoreM
             />
           </div>
 
-          {/* Reason */}
           <div>
             <label className="text-sm font-medium mb-2 block">备注</label>
             <Input

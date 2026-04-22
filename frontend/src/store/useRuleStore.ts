@@ -1,93 +1,73 @@
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
-import type { Rule } from '@/types';
-import { generateId } from '@/lib/utils';
-
-const defaultRules: Rule[] = [
-  { id: generateId(), name: '课堂回答问题', score: 5, type: 'add', category: '学习', icon: '✋' },
-  { id: generateId(), name: '作业优秀', score: 3, type: 'add', category: '学习', icon: '📝' },
-  { id: generateId(), name: '帮助同学', score: 2, type: 'add', category: '品德', icon: '🤝' },
-  { id: generateId(), name: '课堂表现好', score: 2, type: 'add', category: '学习', icon: '⭐' },
-  { id: generateId(), name: '值日认真', score: 2, type: 'add', category: '劳动', icon: '🧹' },
-  { id: generateId(), name: '迟到早退', score: 3, type: 'minus', category: '纪律', icon: '⏰' },
-  { id: generateId(), name: '作业未交', score: 5, type: 'minus', category: '学习', icon: '❌' },
-  { id: generateId(), name: '上课说话', score: 2, type: 'minus', category: '纪律', icon: '🗣️' },
-];
+import { api } from '@/lib/api';
+import type { RuleData } from '@/lib/api';
 
 interface RuleStore {
-  rules: Rule[];
-  
-  // Actions
-  addRule: (data: Omit<Rule, 'id'>) => Rule;
-  updateRule: (id: string, updates: Partial<Rule>) => Rule | null;
-  deleteRule: (id: string) => void;
-  getRuleById: (id: string) => Rule | undefined;
-  getRulesByType: (type: 'add' | 'minus') => Rule[];
-  setRules: (rules: Rule[]) => void;
+  rules: RuleData[];
+  loading: boolean;
+
+  fetchRules: (classId: number) => Promise<void>;
+  addRule: (classId: number, data: { name: string; score: number; type: string; category?: string; icon?: string }) => Promise<RuleData | null>;
+  updateRule: (id: number, updates: { name?: string; score?: number; type?: string; category?: string; icon?: string }) => Promise<RuleData | null>;
+  deleteRule: (id: number) => Promise<boolean>;
+  getRuleById: (id: number) => RuleData | undefined;
+  getRulesByType: (type: 'add' | 'minus') => RuleData[];
+  setRules: (rules: RuleData[]) => void;
   clearRules: () => void;
-  initDefaultRules: () => void;
 }
 
 export const useRuleStore = create<RuleStore>()(
-  persist(
-    (set, get) => ({
-      rules: [],
-      
-      addRule: (data) => {
-        const newRule: Rule = {
-          id: generateId(),
-          name: data.name,
-          score: Math.abs(data.score),
-          type: data.type,
-          category: data.category || '其他',
-          icon: data.icon || '📌',
-        };
-        set((state) => ({ rules: [...state.rules, newRule] }));
-        return newRule;
-      },
-      
-      updateRule: (id, updates) => {
-        const rules = get().rules;
-        const index = rules.findIndex(r => r.id === id);
-        if (index === -1) return null;
-        
-        const updatedRule = { ...rules[index], ...updates };
-        const newRules = [...rules];
-        newRules[index] = updatedRule;
-        set({ rules: newRules });
-        return updatedRule;
-      },
-      
-      deleteRule: (id) => {
+  (set, get) => ({
+    rules: [],
+    loading: false,
+
+    fetchRules: async (classId) => {
+      set({ loading: true });
+      const result = await api.listRules(classId);
+      if (result.success && result.data) {
+        set({ rules: result.data });
+      }
+      set({ loading: false });
+    },
+
+    addRule: async (classId, data) => {
+      const result = await api.createRule(classId, data);
+      if (result.success && result.data) {
+        set((state) => ({ rules: [...state.rules, result.data!] }));
+        return result.data;
+      }
+      return null;
+    },
+
+    updateRule: async (id, updates) => {
+      const result = await api.updateRule(id, updates);
+      if (result.success && result.data) {
+        const updated = result.data;
         set((state) => ({
-          rules: state.rules.filter(r => r.id !== id)
+          rules: state.rules.map(r => r.id === id ? updated : r),
         }));
-      },
-      
-      getRuleById: (id) => {
-        return get().rules.find(r => r.id === id);
-      },
-      
-      getRulesByType: (type) => {
-        return get().rules.filter(r => r.type === type);
-      },
-      
-      setRules: (rules) => {
-        set({ rules });
-      },
-      
-      clearRules: () => {
-        set({ rules: [] });
-      },
-      
-      initDefaultRules: () => {
-        if (get().rules.length === 0) {
-          set({ rules: defaultRules });
-        }
-      },
-    }),
-    {
-      name: 'classScore_rules',
-    }
-  )
+        return updated;
+      }
+      return null;
+    },
+
+    deleteRule: async (id) => {
+      const result = await api.deleteRule(id);
+      if (result.success) {
+        set((state) => ({
+          rules: state.rules.filter(r => r.id !== id),
+        }));
+        return true;
+      }
+      return false;
+    },
+
+    getRuleById: (id) => get().rules.find(r => r.id === id),
+
+    getRulesByType: (type) => get().rules.filter(r => r.type === type),
+
+    setRules: (rules) => set({ rules }),
+
+    clearRules: () => set({ rules: [] }),
+  })
 );

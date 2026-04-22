@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { useStudentStore, useSettingsStore } from '@/store';
+import { useStudentStore, useSettingsStore, useAuthStore } from '@/store';
 import { cn, getAvatarClass, formatRelativeTime } from '@/lib/utils';
 import type { Student } from '@/types';
 import { toast } from 'sonner';
@@ -15,8 +15,9 @@ import { Play, History, Users, Dices } from 'lucide-react';
 export default function ToolsPage() {
   const { students } = useStudentStore();
   const { rollCallHistory, addRollCallRecord } = useSettingsStore();
+  const currentClassId = useAuthStore((s) => s.currentClassId);
+  const isTeacher = useAuthStore((s) => s.role === 'teacher');
 
-  // Roll call state
   const [rollCallCount, setRollCallCount] = useState(1);
   const [isRolling, setIsRolling] = useState(false);
   const [rolledStudents, setRolledStudents] = useState<Student[]>([]);
@@ -31,7 +32,6 @@ export default function ToolsPage() {
     };
   }, []);
 
-  // Roll call logic
   const startRollCall = useCallback(() => {
     if (students.length === 0) {
       toast.error('没有学生可以点名');
@@ -41,69 +41,74 @@ export default function ToolsPage() {
       toast.error('点名人数不能超过学生总数');
       return;
     }
+    if (!currentClassId) return;
 
     setIsRolling(true);
     setRolledStudents([]);
     setCurrentStudent(null);
 
     let elapsed = 0;
-    const duration = 2000; // 2 seconds
-    const interval = 50; // Update every 50ms
+    const duration = 2000;
+    const interval = 50;
 
     rollIntervalRef.current = setInterval(() => {
-      // Show random student during rolling
       const randomStudent = students[Math.floor(Math.random() * students.length)];
       setCurrentStudent(randomStudent);
-      
+
       elapsed += interval;
-      
+
       if (elapsed >= duration) {
         if (rollIntervalRef.current) clearInterval(rollIntervalRef.current);
-        
-        // Select final students
+
         const shuffled = [...students].sort(() => Math.random() - 0.5);
         const selected = shuffled.slice(0, rollCallCount);
-        
+
         setRolledStudents(selected);
         setCurrentStudent(null);
         setIsRolling(false);
-        
-        // Save to history
-        addRollCallRecord(selected.map(s => s.name));
-        
+
+        addRollCallRecord(currentClassId, selected.map(s => s.name));
         toast.success(`点名完成！选中 ${selected.length} 人`);
       }
     }, interval);
-  }, [students, rollCallCount, addRollCallRecord]);
+  }, [students, rollCallCount, addRollCallRecord, currentClassId]);
 
   const stopRollCall = useCallback(() => {
     if (rollIntervalRef.current) {
       clearInterval(rollIntervalRef.current);
       rollIntervalRef.current = null;
     }
-    
-    // Select final students immediately
+    if (!currentClassId) return;
+
     const shuffled = [...students].sort(() => Math.random() - 0.5);
     const selected = shuffled.slice(0, rollCallCount);
-    
+
     setRolledStudents(selected);
     setCurrentStudent(null);
     setIsRolling(false);
-    
-    addRollCallRecord(selected.map(s => s.name));
+
+    addRollCallRecord(currentClassId, selected.map(s => s.name));
     toast.success(`点名完成！选中 ${selected.length} 人`);
-  }, [students, rollCallCount, addRollCallRecord]);
+  }, [students, rollCallCount, addRollCallRecord, currentClassId]);
+
+  if (!isTeacher) {
+    return (
+      <div className="animate-fade-in flex flex-col items-center justify-center py-12 text-center">
+        <div className="text-6xl mb-4">🧰</div>
+        <h3 className="text-lg font-medium mb-2">工具箱仅供老师使用</h3>
+        <p className="text-muted-foreground">学生暂无可用工具</p>
+      </div>
+    );
+  }
 
   return (
     <div className="animate-fade-in space-y-6">
-      {/* Header */}
       <h2 className="text-lg font-semibold flex items-center gap-2">
         <span>🧰</span>
         工具箱
       </h2>
 
       <div className="grid md:grid-cols-2 gap-6">
-        {/* Roll Call */}
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
@@ -112,7 +117,6 @@ export default function ToolsPage() {
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            {/* Settings */}
             <div className="flex items-center gap-4">
               <label className="text-sm font-medium">点名人数:</label>
               <Select
@@ -131,7 +135,6 @@ export default function ToolsPage() {
               </Select>
             </div>
 
-            {/* Rolling display */}
             <div className="min-h-[120px] flex items-center justify-center bg-muted/50 rounded-xl p-4">
               {isRolling && currentStudent ? (
                 <div className="text-center animate-pulse">
@@ -159,7 +162,6 @@ export default function ToolsPage() {
               )}
             </div>
 
-            {/* Actions */}
             <div className="flex gap-2">
               {isRolling ? (
                 <Button onClick={stopRollCall} variant="destructive" className="flex-1">
@@ -177,10 +179,8 @@ export default function ToolsPage() {
             </div>
           </CardContent>
         </Card>
-
       </div>
 
-      {/* Roll Call History Modal */}
       <Dialog open={rollCallHistoryOpen} onOpenChange={setRollCallHistoryOpen}>
         <DialogContent>
           <DialogHeader>
@@ -192,9 +192,9 @@ export default function ToolsPage() {
                 {rollCallHistory.map((record) => (
                   <div key={record.id} className="p-3 bg-muted/50 rounded-lg">
                     <div className="flex justify-between items-start">
-                      <div className="font-medium">{record.students.join('、')}</div>
+                      <div className="font-medium">{record.student_names.join('、')}</div>
                       <div className="text-xs text-muted-foreground">
-                        {formatRelativeTime(record.createdAt)}
+                        {formatRelativeTime(record.created_at)}
                       </div>
                     </div>
                   </div>
@@ -209,7 +209,6 @@ export default function ToolsPage() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-
     </div>
   );
 }

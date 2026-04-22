@@ -1,86 +1,65 @@
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
-import type { ClassInfo, Settings, RollCallRecord } from '@/types';
-import { generateId } from '@/lib/utils';
+import { api } from '@/lib/api';
+import type { ClassSettingsData, RollCallData } from '@/lib/api';
 
 interface SettingsStore {
-  // Class info
-  classInfo: ClassInfo;
-  setClassInfo: (info: Partial<ClassInfo>) => void;
-  
-  // Settings
-  settings: Settings;
-  setSettings: (settings: Partial<Settings>) => void;
-  
-  // Roll call history
-  rollCallHistory: RollCallRecord[];
-  addRollCallRecord: (students: string[]) => RollCallRecord;
-  setRollCallHistory: (history: RollCallRecord[]) => void;
-  
-  // Clear all
+  settings: ClassSettingsData | null;
+  rollCallHistory: RollCallData[];
+  loading: boolean;
+
+  fetchSettings: (classId: number) => Promise<void>;
+  updateSettings: (classId: number, updates: { theme?: string; animation_speed?: string; sound_enabled?: boolean }) => Promise<void>;
+
+  fetchRollCallHistory: (classId: number) => Promise<void>;
+  addRollCallRecord: (classId: number, students: string[]) => Promise<RollCallData | null>;
+
+  setSettings: (settings: ClassSettingsData) => void;
+  setRollCallHistory: (history: RollCallData[]) => void;
   clearAll: () => void;
 }
 
-const defaultClassInfo: ClassInfo = {
-  name: '我的班级',
-  teacher: '班主任',
-  createdAt: new Date().toISOString(),
-};
-
-const defaultSettings: Settings = {
-  theme: 'light',
-  animationSpeed: 'normal',
-  soundEnabled: true,
-};
-
 export const useSettingsStore = create<SettingsStore>()(
-  persist(
-    (set) => ({
-      classInfo: defaultClassInfo,
-      settings: defaultSettings,
-      rollCallHistory: [],
-      
-      setClassInfo: (info) => {
+  (set) => ({
+    settings: null,
+    rollCallHistory: [],
+    loading: false,
+
+    fetchSettings: async (classId) => {
+      set({ loading: true });
+      const result = await api.getSettings(classId);
+      if (result.success && result.data) {
+        set({ settings: result.data });
+      }
+      set({ loading: false });
+    },
+
+    updateSettings: async (classId, updates) => {
+      const result = await api.updateSettings(classId, updates);
+      if (result.success && result.data) {
+        set({ settings: result.data });
+      }
+    },
+
+    fetchRollCallHistory: async (classId) => {
+      const result = await api.listRollCalls(classId);
+      if (result.success && result.data) {
+        set({ rollCallHistory: result.data });
+      }
+    },
+
+    addRollCallRecord: async (classId, students) => {
+      const result = await api.createRollCall(classId, students);
+      if (result.success && result.data) {
         set((state) => ({
-          classInfo: { ...state.classInfo, ...info }
+          rollCallHistory: [result.data!, ...state.rollCallHistory].slice(0, 50),
         }));
-      },
-      
-      setSettings: (newSettings) => {
-        set((state) => ({
-          settings: { ...state.settings, ...newSettings }
-        }));
-      },
-      
-      addRollCallRecord: (students) => {
-        const record: RollCallRecord = {
-          id: generateId(),
-          students,
-          createdAt: new Date().toISOString(),
-        };
-        set((state) => {
-          const history = [record, ...state.rollCallHistory];
-          // Keep only last 50 records
-          if (history.length > 50) history.pop();
-          return { rollCallHistory: history };
-        });
-        return record;
-      },
-      
-      setRollCallHistory: (history) => {
-        set({ rollCallHistory: history });
-      },
-      
-      clearAll: () => {
-        set({
-          classInfo: defaultClassInfo,
-          settings: defaultSettings,
-          rollCallHistory: [],
-        });
-      },
-    }),
-    {
-      name: 'classScore_settings',
-    }
-  )
+        return result.data;
+      }
+      return null;
+    },
+
+    setSettings: (settings) => set({ settings }),
+    setRollCallHistory: (history) => set({ rollCallHistory: history }),
+    clearAll: () => set({ settings: null, rollCallHistory: [] }),
+  })
 );

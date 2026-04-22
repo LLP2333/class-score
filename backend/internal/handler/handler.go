@@ -14,23 +14,18 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 )
 
-// Handler HTTP处理器
 type Handler struct {
-	config      *config.Config
-	sqliteStore *store.SQLiteStore
-	fileStore   *store.FileStore
+	config *config.Config
+	store  *store.SQLiteStore
 }
 
-// NewHandler 创建处理器实例
-func NewHandler(cfg *config.Config, sqlite *store.SQLiteStore, file *store.FileStore) *Handler {
+func NewHandler(cfg *config.Config, s *store.SQLiteStore) *Handler {
 	return &Handler{
-		config:      cfg,
-		sqliteStore: sqlite,
-		fileStore:   file,
+		config: cfg,
+		store:  s,
 	}
 }
 
-// respondOK 返回成功响应
 func (h *Handler) respondOK(c *gin.Context, data interface{}, message string) {
 	resp := model.APIResponse{Success: true, Data: data}
 	if message != "" {
@@ -39,7 +34,6 @@ func (h *Handler) respondOK(c *gin.Context, data interface{}, message string) {
 	c.JSON(http.StatusOK, resp)
 }
 
-// respondCreated 返回201创建成功响应
 func (h *Handler) respondCreated(c *gin.Context, data interface{}, message string) {
 	c.JSON(http.StatusCreated, model.APIResponse{
 		Success: true,
@@ -48,7 +42,6 @@ func (h *Handler) respondCreated(c *gin.Context, data interface{}, message strin
 	})
 }
 
-// respondError 返回错误响应
 func (h *Handler) respondError(c *gin.Context, status int, message string) {
 	c.JSON(status, model.APIResponse{
 		Success: false,
@@ -56,7 +49,53 @@ func (h *Handler) respondError(c *gin.Context, status int, message string) {
 	})
 }
 
-// AuthMiddleware JWT认证中间件
+func (h *Handler) generateToken(userID int64, username, role string) (string, error) {
+	claims := jwt.MapClaims{
+		"user_id":  userID,
+		"username": username,
+		"role":     role,
+		"exp":      time.Now().Add(time.Hour * time.Duration(h.config.JWT.ExpireHours)).Unix(),
+		"iat":      time.Now().Unix(),
+	}
+
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+	return token.SignedString([]byte(h.config.JWT.Secret))
+}
+
+type tokenClaims struct {
+	UserID   int64
+	Username string
+	Role     string
+}
+
+func (h *Handler) validateToken(tokenString string) (*tokenClaims, error) {
+	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
+		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+			return nil, errors.New("无效的签名方法")
+		}
+		return []byte(h.config.JWT.Secret), nil
+	})
+
+	if err != nil {
+		return nil, err
+	}
+
+	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
+		username, _ := claims["username"].(string)
+		role, _ := claims["role"].(string)
+		var userID int64
+		if uid, ok := claims["user_id"].(float64); ok {
+			userID = int64(uid)
+		}
+		if username == "" {
+			return nil, errors.New("无效的Token")
+		}
+		return &tokenClaims{UserID: userID, Username: username, Role: role}, nil
+	}
+
+	return nil, errors.New("无效的Token")
+}
+
 func (h *Handler) AuthMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		tokenStr := ""
@@ -73,50 +112,62 @@ func (h *Handler) AuthMiddleware() gin.HandlerFunc {
 			return
 		}
 
-		username, err := h.validateToken(tokenStr)
+		claims, err := h.validateToken(tokenStr)
 		if err != nil {
 			h.respondError(c, http.StatusUnauthorized, "Token无效或已过期")
 			c.Abort()
 			return
 		}
 
-		c.Set("username", username)
+		c.Set("user_id", claims.UserID)
+		c.Set("username", claims.Username)
+		c.Set("role", claims.Role)
 		c.Next()
 	}
 }
 
-// generateToken 生成JWT Token
-func (h *Handler) generateToken(username string) (string, error) {
-	claims := jwt.MapClaims{
-		"username": username,
-		"exp":      time.Now().Add(time.Hour * time.Duration(h.config.JWT.ExpireHours)).Unix(),
-		"iat":      time.Now().Unix(),
+func (h *Handler) TeacherOnly() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		role := c.GetString("role")
+		if role != "teacher" {
+			h.respondError(c, http.StatusForbidden, "仅教师可执行此操作")
+			c.Abort()
+			return
+		}
+		c.Next()
 	}
-
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	return token.SignedString([]byte(h.config.JWT.Secret))
 }
 
-// validateToken 验证JWT Token
-func (h *Handler) validateToken(tokenString string) (string, error) {
-	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
-		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
-			return nil, errors.New("无效的签名方法")
-		}
-		return []byte(h.config.JWT.Secret), nil
-	})
+func (h *Handler) getUserID(c *gin.Context) int64 {
+	id, _ := c.Get("user_id")
+	if uid, ok := id.(int64); ok {
+		return uid
+	}
+	return 0
+}
 
-	if err != nil {
-		return "", err
+func (h *Handler) checkClassAccess(c *gin.Context, classID int64) bool {
+	role := c.GetString("role")
+	userID := h.getUserID(c)
+
+	if role == "teacher" {
+		owner, err := h.store.IsClassOwner(classID, userID)
+		if err != nil || !owner {
+			h.respondError(c, http.StatusForbidden, "无权访问此班级")
+			return false
+		}
+		return true
 	}
 
-	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
-		username, ok := claims["username"].(string)
-		if !ok {
-			return "", errors.New("无效的Token")
+	if role == "student" {
+		st, err := h.store.GetStudentByUserID(userID)
+		if err != nil || st.ClassID != classID {
+			h.respondError(c, http.StatusForbidden, "无权访问此班级")
+			return false
 		}
-		return username, nil
+		return true
 	}
 
-	return "", errors.New("无效的Token")
+	h.respondError(c, http.StatusForbidden, "无权限")
+	return false
 }
