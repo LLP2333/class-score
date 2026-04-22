@@ -429,12 +429,13 @@ export default function GroupsPage() {
       {/* PK Modal */}
       <Dialog open={pkModalOpen} onOpenChange={setPkModalOpen}>
         <DialogContent>
-          <DialogHeader><DialogTitle>小组PK</DialogTitle></DialogHeader>
-          <div className="space-y-4">
-            <div className="text-center">
+          <DialogHeader>
+            <DialogTitle className="text-center">
               <div className="text-5xl mb-2">⚔️</div>
-              <h3 className="font-semibold">小组积分PK榜</h3>
-            </div>
+              小组积分PK榜
+            </DialogTitle>
+          </DialogHeader>
+          <div className="max-h-[50vh] overflow-y-auto -mx-2 px-2">
             <div className="space-y-3">
               {groupsWithScore.map((g, i) => {
                 const maxScore = groupsWithScore[0]?.totalScore || 1;
@@ -442,13 +443,13 @@ export default function GroupsPage() {
                 const bgColor = groupColors[(g.color - 1) % groupColors.length];
                 return (
                   <div key={g.id} className="flex items-center gap-3">
-                    <div className={cn('w-8 h-8 rounded-full flex items-center justify-center font-bold text-white', i === 0 && 'bg-gradient-to-br from-yellow-400 to-orange-500', i === 1 && 'bg-gradient-to-br from-gray-300 to-gray-400', i === 2 && 'bg-gradient-to-br from-amber-600 to-amber-700', i > 2 && 'bg-gray-200 text-gray-600')}>
+                    <div className={cn('w-8 h-8 rounded-full flex items-center justify-center font-bold text-white shrink-0', i === 0 && 'bg-gradient-to-br from-yellow-400 to-orange-500', i === 1 && 'bg-gradient-to-br from-gray-300 to-gray-400', i === 2 && 'bg-gradient-to-br from-amber-600 to-amber-700', i > 2 && 'bg-gray-200 text-gray-600')}>
                       {i + 1}
                     </div>
-                    <div className="flex-1">
+                    <div className="flex-1 min-w-0">
                       <div className="flex justify-between mb-1">
-                        <span className="font-medium">{g.name}</span>
-                        <span className="font-bold" style={{ color: bgColor }}>{g.totalScore}分</span>
+                        <span className="font-medium truncate">{g.name}</span>
+                        <span className="font-bold shrink-0 ml-2" style={{ color: bgColor }}>{g.totalScore}分</span>
                       </div>
                       <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
                         <div className="h-full rounded-full transition-all duration-500" style={{ width: `${percentage}%`, background: bgColor }} />

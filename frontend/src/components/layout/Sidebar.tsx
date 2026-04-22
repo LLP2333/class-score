@@ -90,30 +90,38 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
 
         {role === 'teacher' && classes.length > 0 && (
           <div className="px-2 py-2 border-b border-sidebar-border">
-            <button
-              onClick={() => setClassMenuOpen(!classMenuOpen)}
-              className="w-full flex items-center justify-between px-3 py-2 rounded-lg hover:bg-sidebar-accent text-sm text-sidebar-foreground"
-            >
-              <span className="truncate">{currentClass?.name || '选择班级'}</span>
-              <ChevronDown className={cn('h-4 w-4 shrink-0 transition-transform', classMenuOpen && 'rotate-180')} />
-            </button>
-            {classMenuOpen && (
-              <div className="mt-1 space-y-0.5">
-                {classes.map(c => (
-                  <button
-                    key={c.id}
-                    onClick={() => handleClassSwitch(c.id)}
-                    className={cn(
-                      'w-full text-left px-3 py-1.5 rounded text-sm',
-                      c.id === currentClassId
-                        ? 'bg-primary text-primary-foreground'
-                        : 'text-sidebar-foreground hover:bg-sidebar-accent'
-                    )}
-                  >
-                    {c.name}
-                  </button>
-                ))}
+            {classes.length === 1 ? (
+              <div className="flex items-center gap-2 px-3 py-2 text-sm text-sidebar-foreground">
+                <span className="truncate font-medium">{currentClass?.name}</span>
               </div>
+            ) : (
+              <>
+                <button
+                  onClick={() => setClassMenuOpen(!classMenuOpen)}
+                  className="w-full flex items-center justify-between px-3 py-2 rounded-lg hover:bg-sidebar-accent text-sm text-sidebar-foreground"
+                >
+                  <span className="truncate">{currentClass?.name || '选择班级'}</span>
+                  <ChevronDown className={cn('h-4 w-4 shrink-0 transition-transform', classMenuOpen && 'rotate-180')} />
+                </button>
+                {classMenuOpen && (
+                  <div className="mt-1 space-y-0.5">
+                    {classes.map(c => (
+                      <button
+                        key={c.id}
+                        onClick={() => handleClassSwitch(c.id)}
+                        className={cn(
+                          'w-full text-left px-3 py-1.5 rounded text-sm',
+                          c.id === currentClassId
+                            ? 'bg-primary text-primary-foreground'
+                            : 'text-sidebar-foreground hover:bg-sidebar-accent'
+                        )}
+                      >
+                        {c.name}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </>
             )}
           </div>
         )}
