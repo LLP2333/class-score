@@ -53,6 +53,16 @@ func (h *Handler) CreateStudent(c *gin.Context) {
 		return
 	}
 
+	exists, err := h.store.StudentExistsInClass(classID, req.Name)
+	if err != nil {
+		h.respondError(c, http.StatusInternalServerError, "校验失败: "+err.Error())
+		return
+	}
+	if exists {
+		h.respondError(c, http.StatusConflict, "该班级已存在同名学生「"+req.Name+"」")
+		return
+	}
+
 	if req.Avatar <= 0 {
 		req.Avatar = 1
 	}

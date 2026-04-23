@@ -204,6 +204,14 @@ func (s *SQLiteStore) ResetStudentPassword(studentID int64, newPassword string) 
 	return s.UpdateUserPassword(*st.UserID, newPassword)
 }
 
+func (s *SQLiteStore) StudentExistsInClass(classID int64, name string) (bool, error) {
+	var count int
+	err := s.db.QueryRow(
+		"SELECT COUNT(*) FROM students WHERE class_id = ? AND name = ?", classID, name,
+	).Scan(&count)
+	return count > 0, err
+}
+
 func (s *SQLiteStore) GetStudentClassID(studentID int64) (int64, error) {
 	var classID int64
 	err := s.db.QueryRow("SELECT class_id FROM students WHERE id = ?", studentID).Scan(&classID)

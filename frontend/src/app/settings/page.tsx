@@ -151,6 +151,7 @@ export default function SettingsPage() {
     const file = event.target.files?.[0];
     if (!file || !currentClassId) return;
 
+    setLoading(true);
     const reader = new FileReader();
     reader.onload = async (e) => {
       try {
@@ -159,26 +160,39 @@ export default function SettingsPage() {
         const worksheet = workbook.Sheets[workbook.SheetNames[0]];
         const jsonData = XLSX.utils.sheet_to_json(worksheet) as Array<Record<string, unknown>>;
 
-        let count = 0;
+        let success = 0;
+        const skippedDup: string[] = [];
+        const skippedEmpty = { count: 0 };
+
         for (const row of jsonData) {
-          const name = (row['姓名'] || row['名字'] || row['name']) as string;
-          if (name && typeof name === 'string' && name.trim()) {
-            await api.createStudent(currentClassId, {
-              name: name.trim(),
-              avatar: Math.floor(Math.random() * 8) + 1,
-              password: '123456',
-            });
-            count++;
+          const name = (row['姓名'] || row['名字'] || row['name'] || row['Name']) as string;
+          if (!name || typeof name !== 'string' || !name.trim()) {
+            skippedEmpty.count++;
+            continue;
+          }
+          const result = await api.createStudent(currentClassId, {
+            name: name.trim(),
+            avatar: Math.floor(Math.random() * 8) + 1,
+            password: '123456',
+          });
+          if (result.success) {
+            success++;
+          } else if (result.error?.includes('同名')) {
+            skippedDup.push(name.trim());
           }
         }
 
-        if (count > 0) {
-          toast.success(`成功导入 ${count} 名学生`);
-          useStudentStore.getState().fetchStudents(currentClassId);
+        const parts: string[] = [];
+        if (success > 0) parts.push(`成功导入 ${success} 名学生`);
+        if (skippedDup.length > 0) parts.push(`跳过 ${skippedDup.length} 名重名学生（${skippedDup.join('、')}）`);
+        if (parts.length > 0) {
+          toast[success > 0 ? 'success' : 'warning'](parts.join('；'));
+          if (success > 0) useStudentStore.getState().fetchStudents(currentClassId);
         } else {
-          toast.error('未找到有效数据');
+          toast.error('未找到有效数据，请确保 Excel 中包含「姓名」列');
         }
-      } catch { toast.error('导入失败'); }
+      } catch { toast.error('导入失败，请检查文件格式'); }
+      finally { setLoading(false); }
     };
     reader.readAsArrayBuffer(file);
     if (excelInputRef.current) excelInputRef.current.value = '';
@@ -317,10 +331,13 @@ export default function SettingsPage() {
               <div className="grid sm:grid-cols-2 gap-4">
                 <div className="p-4 border rounded-lg space-y-2">
                   <h4 className="font-medium">导入学生</h4>
-                  <p className="text-sm text-muted-foreground">从 Excel 文件批量添加学生到当前班级</p>
-                  <Button variant="outline" size="sm" onClick={() => excelInputRef.current?.click()}>
+                  <p className="text-sm text-muted-foreground">从 Excel 文件批量添加学生到当前班级，已存在的同名学生会自动跳过</p>
+                  <div className="text-xs text-muted-foreground bg-muted/50 rounded p-2">
+                    Excel 需包含<strong>「姓名」</strong>列（也支持「名字」或「name」），其他列会被忽略。默认密码为 123456。
+                  </div>
+                  <Button variant="outline" size="sm" onClick={() => excelInputRef.current?.click()} disabled={loading}>
                     <Upload className="h-4 w-4 mr-1" />
-                    导入学生 (Excel)
+                    {loading ? '导入中...' : '导入学生 (Excel)'}
                   </Button>
                   <input ref={excelInputRef} type="file" accept=".xlsx,.xls" className="hidden" onChange={handleImportExcel} />
                 </div>
