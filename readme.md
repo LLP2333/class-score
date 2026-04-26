@@ -275,20 +275,20 @@ docker compose up -d
 
 #### 首次生成 Android 工程
 
-> 将 `https://api-class-score.qvqw.date` 替换为实际后端 API 地址。
+> 将 `https://api-score.qvqw.date` 替换为实际后端 API 地址。
 
 ```bash
 cd frontend
 npm install
 
-NEXT_PUBLIC_API_URL="https://api-class-score.qvqw.date" npm run android:add
+NEXT_PUBLIC_API_URL="https://api-score.qvqw.date" npm run android:add
 ```
 
 首次执行后会生成 `frontend/android/` 原生工程。后续修改前端代码后，不需要重复 `android:add`，只需要同步资源：
 
 ```bash
 cd frontend
-NEXT_PUBLIC_API_URL="https://api-class-score.qvqw.date" npm run android:sync
+NEXT_PUBLIC_API_URL="https://api-score.qvqw.date" npm run android:sync
 ```
 
 #### 构建 APK
@@ -306,7 +306,7 @@ npm run android:open
 
 ```bash
 cd frontend
-NEXT_PUBLIC_API_URL="https://api-class-score.qvqw.date" npm run android:apk
+NEXT_PUBLIC_API_URL="https://api-score.qvqw.date" npm run android:apk
 ```
 
 构建产物通常位于 `frontend/android/app/build/outputs/apk/debug/app-debug.apk`。
@@ -350,7 +350,7 @@ docker buildx build \
 # 构建并推送 frontend
 docker buildx build \
   --platform linux/amd64,linux/arm64 \
-  --build-arg NEXT_PUBLIC_API_URL="https://api-class-score.qvqw.date" \
+  --build-arg NEXT_PUBLIC_API_URL="https://api-score.qvqw.date" \
   -t llp2333/classscore-frontend:latest \
   --push \
   ./frontend
