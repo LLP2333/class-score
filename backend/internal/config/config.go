@@ -39,7 +39,7 @@ func Load(configPath string) (*Config, error) {
 	cfg := &Config{
 		Server: ServerConfig{
 			Port:           8000,
-			AllowedOrigins: []string{"http://127.0.0.1", "http://localhost", "file://"},
+			AllowedOrigins: []string{"http://127.0.0.1", "http://localhost", "https://localhost", "capacitor://localhost", "ionic://localhost", "file://"},
 		},
 		Storage: StorageConfig{
 			DataDir:     "./data",

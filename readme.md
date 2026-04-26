@@ -316,7 +316,8 @@ NEXT_PUBLIC_API_URL="https://api-score.qvqw.date" npm run android:apk
 - APK 只内置前端，不内置 Go 后端和 SQLite 数据库服务
 - `NEXT_PUBLIC_API_URL` 会在构建时写入前端代码，必须填写 Android 设备可访问的后端地址
 - 如果只在模拟器连接本机后端，可将 API 地址设置为 `http://10.0.2.2:8000`
-- 正式发布前建议生成签名 Release APK，并在后端配置允许 Android 应用访问的 CORS 来源
+- 后端 `allowed_origins` 需要允许 Capacitor WebView 来源；本项目 Android 包使用 `http://localhost`
+- 正式发布前建议生成签名 Release APK，并确认 HTTPS 证书、CORS 和后端域名均可被手机访问
 
 ### 跨架构构建（M 芯片 Mac → x86 服务器）
 
@@ -337,7 +338,7 @@ docker login
 
 **3. 构建并推送镜像**
 
-> 将 `llp2333` 替换为你的 DockerHub 用户名，`https://api-class-score.qvqw.date` 替换为服务端实际地址。
+> 将 `llp2333` 替换为你的 DockerHub 用户名，`https://api-score.qvqw.date` 替换为服务端实际地址。
 
 ```bash
 # 构建并推送 backend

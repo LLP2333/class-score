@@ -5,7 +5,7 @@ const config: CapacitorConfig = {
   appName: '班级积分管理系统',
   webDir: 'out',
   server: {
-    androidScheme: 'https',
+    androidScheme: 'http',
   },
 };
 
