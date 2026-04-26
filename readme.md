@@ -9,12 +9,14 @@
 - **认证**：JWT + 角色鉴权（teacher / student）
 - **多班级**：一个老师可管理多个班级，学生只读访问所属班级数据
 - **学生登录**：老师创建学生账号，学生可登录查看数据（不可修改）
+- **Android 打包**：Capacitor + Next.js 静态导出，可生成 Android APK
 
 ## 核心要求
 
 - 数据可视化
 - 智能点名
 - 一键导出
+- 支持打包为 Android APK，便于老师在手机或平板上安装使用
 
 ## 9大核心功能模块
 
@@ -259,6 +261,62 @@ docker compose up -d
 ```
 
 默认前端地址 `http://localhost:3000`，后端地址 `http://localhost:8000`。
+
+### Android APK 打包
+
+项目可以打包为 Android APK。当前实现采用 **Capacitor 容器 + Next.js 静态导出**：APK 内置前端页面资源，业务数据仍通过后端 API 读写。因此 Android 正式包需要配置一个手机可访问的后端地址，生产环境建议使用 HTTPS 域名。
+
+#### 打包前置条件
+
+- 安装 Node.js、npm
+- 安装 Android Studio、Android SDK 和 JDK
+- 后端服务已部署，并可被 Android 设备访问
+- 不要在真机正式包中使用 `localhost` 作为 API 地址；真机上的 `localhost` 指向手机本身
+
+#### 首次生成 Android 工程
+
+> 将 `https://api-class-score.qvqw.date` 替换为实际后端 API 地址。
+
+```bash
+cd frontend
+npm install
+
+NEXT_PUBLIC_API_URL="https://api-class-score.qvqw.date" npm run android:add
+```
+
+首次执行后会生成 `frontend/android/` 原生工程。后续修改前端代码后，不需要重复 `android:add`，只需要同步资源：
+
+```bash
+cd frontend
+NEXT_PUBLIC_API_URL="https://api-class-score.qvqw.date" npm run android:sync
+```
+
+#### 构建 APK
+
+方式一：使用 Android Studio 打包
+
+```bash
+cd frontend
+npm run android:open
+```
+
+在 Android Studio 中选择 `Build > Build Bundle(s) / APK(s) > Build APK(s)`。
+
+方式二：命令行构建 Debug APK
+
+```bash
+cd frontend
+NEXT_PUBLIC_API_URL="https://api-class-score.qvqw.date" npm run android:apk
+```
+
+构建产物通常位于 `frontend/android/app/build/outputs/apk/debug/app-debug.apk`。
+
+#### Android 打包注意事项
+
+- APK 只内置前端，不内置 Go 后端和 SQLite 数据库服务
+- `NEXT_PUBLIC_API_URL` 会在构建时写入前端代码，必须填写 Android 设备可访问的后端地址
+- 如果只在模拟器连接本机后端，可将 API 地址设置为 `http://10.0.2.2:8000`
+- 正式发布前建议生成签名 Release APK，并在后端配置允许 Android 应用访问的 CORS 来源
 
 ### 跨架构构建（M 芯片 Mac → x86 服务器）
 

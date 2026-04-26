@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">班级积分管理系统</string>
+    <string name="title_activity_main">班级积分管理系统</string>
+    <string name="package_name">date.qvqw.classscore</string>
+    <string name="custom_url_scheme">date.qvqw.classscore</string>
+</resources>
