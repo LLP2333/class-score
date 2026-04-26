@@ -7,7 +7,7 @@ An offline-first class score management system for teachers. Frontend works stan
 ## Tech Stack
 
 - **Frontend:** Next.js 16 + React 19 + TypeScript, Tailwind CSS 4, Zustand 5 (state), TanStack Query, Chart.js
-- **Backend:** Go 1.21, SQLite 3, JWT auth, YAML config
+- **Backend:** Go 1.25, SQLite 3, JWT auth, YAML config
 - **Deploy:** Docker + Docker Compose, standalone Next.js output
 
 ## Project Structure
