@@ -357,6 +357,9 @@ docker buildx build \
   ./frontend
 ```
 
+## 版本历史
+V1.0.1   bug修复
+
 > `NEXT_PUBLIC_API_URL` 会在构建时写入前端代码，必须填写服务器的实际访问地址。
 
 **4. 在服务器上部署**
