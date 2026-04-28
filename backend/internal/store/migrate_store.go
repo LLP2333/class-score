@@ -102,19 +102,7 @@ func (s *SQLiteStore) MigrateFromJSON(teacherID int64, data map[string]interface
 				}
 			}
 
-			// Create student user account
-			username := name
-			baseName := name
-			counter := 1
-			for {
-				var exists int
-				tx.QueryRow("SELECT COUNT(*) FROM users WHERE username = ?", username).Scan(&exists)
-				if exists == 0 {
-					break
-				}
-				counter++
-				username = fmt.Sprintf("%s_%d", baseName, counter)
-			}
+			username := StudentUsername(classID, name)
 
 			hash, err := HashPassword("123456")
 			if err != nil {

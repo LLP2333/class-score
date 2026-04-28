@@ -78,7 +78,7 @@ export function LoginPage() {
             )}
           </div>
           <p className="text-xs text-muted-foreground text-center">
-            学生账号由老师创建，请联系老师获取账号密码
+            学生账号由老师创建，格式为 c班级编号_姓名，请联系老师获取
           </p>
         </CardContent>
       </Card>

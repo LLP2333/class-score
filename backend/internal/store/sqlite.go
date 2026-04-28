@@ -72,6 +72,7 @@ func (s *SQLiteStore) migrate() error {
 	}{
 		{1, func() error { _, err := s.db.Exec(migrationV1); return err }},
 		{2, s.migrateV2},
+		{3, s.migrateV3},
 	}
 
 	for _, m := range migrations {
@@ -233,6 +234,43 @@ CREATE TABLE IF NOT EXISTS pet_config (
     show_on_student_card INTEGER DEFAULT 1
 );
 `
+
+func (s *SQLiteStore) migrateV3() error {
+	rows, err := s.db.Query(`
+		SELECT s.id, s.class_id, s.name, s.user_id
+		FROM students s
+		WHERE s.user_id IS NOT NULL`)
+	if err != nil {
+		return err
+	}
+	defer rows.Close()
+
+	type rec struct {
+		classID int64
+		name    string
+		userID  int64
+	}
+	var recs []rec
+	for rows.Next() {
+		var r rec
+		var sid int64
+		if err := rows.Scan(&sid, &r.classID, &r.name, &r.userID); err != nil {
+			return err
+		}
+		recs = append(recs, r)
+	}
+
+	for _, r := range recs {
+		newUsername := StudentUsername(r.classID, r.name)
+		if _, err := s.db.Exec(
+			"UPDATE users SET username = ? WHERE id = ? AND role = 'student'",
+			newUsername, r.userID,
+		); err != nil {
+			return err
+		}
+	}
+	return nil
+}
 
 func (s *SQLiteStore) migrateV2() error {
 	var count int

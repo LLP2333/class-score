@@ -7,6 +7,10 @@ import (
 	"classScore-backend/internal/model"
 )
 
+func StudentUsername(classID int64, name string) string {
+	return fmt.Sprintf("c%d_%s", classID, name)
+}
+
 func (s *SQLiteStore) CreateStudent(classID int64, name string, avatar int, groupID *int64, password string) (*model.Student, error) {
 	tx, err := s.db.Begin()
 	if err != nil {
@@ -14,22 +18,7 @@ func (s *SQLiteStore) CreateStudent(classID int64, name string, avatar int, grou
 	}
 	defer tx.Rollback()
 
-	// Create student user account with unique username
-	username := name
-	baseName := name
-	counter := 1
-	for {
-		var exists int
-		err := tx.QueryRow("SELECT COUNT(*) FROM users WHERE username = ?", username).Scan(&exists)
-		if err != nil {
-			return nil, err
-		}
-		if exists == 0 {
-			break
-		}
-		counter++
-		username = fmt.Sprintf("%s_%d", baseName, counter)
-	}
+	username := StudentUsername(classID, name)
 
 	if password == "" {
 		password = "123456"

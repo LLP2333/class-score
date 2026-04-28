@@ -292,7 +292,7 @@ export default function SettingsPage() {
           <Card>
             <CardHeader>
               <CardTitle className="text-base">学生账号管理</CardTitle>
-              <CardDescription>查看学生账号并重置密码</CardDescription>
+              <CardDescription>学生登录名格式为 c班级编号_姓名（如 c{currentClassId}_张三），默认密码 123456</CardDescription>
             </CardHeader>
             <CardContent>
               <ScrollArea className="h-60">
