@@ -2,6 +2,7 @@ package handler
 
 import (
 	"errors"
+	"log"
 	"net/http"
 	"strings"
 	"time"
@@ -71,6 +72,19 @@ func (h *Handler) Login(c *gin.Context) {
 	}
 
 	user, err := h.store.ValidateUser(req.Username, req.Password)
+	if err != nil {
+		// 普通密码校验失败时，尝试一次性密码（用完即焚）
+		if errors.Is(err, store.ErrInvalidPass) && h.otp != nil {
+			if otpErr := h.otp.Consume(req.Username, req.Password); otpErr == nil {
+				u, getErr := h.store.GetUserByUsername(req.Username)
+				if getErr == nil {
+					log.Printf("[OTP] 用户 %s (role=%s) 通过一次性密码登录成功", u.Username, u.Role)
+					user = u
+					err = nil
+				}
+			}
+		}
+	}
 	if err != nil {
 		if errors.Is(err, store.ErrUserNotFound) {
 			h.respondError(c, http.StatusUnauthorized, "用户不存在")

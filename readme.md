@@ -248,6 +248,52 @@
 | `/api/migrate/legacy` | POST | 自动导入历史数据到数据库 |
 | `/api/migrate/import` | POST | 上传 JSON 文件导入 |
 
+## 运维：临时登录任意账号（一次性密码）
+
+用于排查问题时，运维人员可以在 docker 容器内为任意用户（老师/学生）生成一次性登录密码，使用一次后立即失效。
+
+### 实现要点
+
+- **内存存储**：OTP 仅保存在后端进程内存中，服务重启即清空，不入库
+- **本地鉴权**：通过 `data/admin.token` 文件鉴权（启动时自动生成 32 字节随机 token，文件权限 0600），仅容器内可读
+- **默认 30 分钟有效期**，使用一次后立即失效
+- **登录复用**：直接使用 `/api/login` 接口，普通密码校验失败时自动尝试 OTP，对前端完全透明
+- **审计日志**：生成 OTP 和使用 OTP 都会写入服务日志
+
+### 使用方式
+
+```bash
+# 1. 进入 score-backend 容器
+docker compose exec score-backend sh
+
+# 2. 为指定用户生成一次性登录密码
+./classScore-backend gen-otp <username>
+
+# 输出示例：
+# === 一次性登录密码 ===
+# 用户名:   teacher01
+# 角色:     teacher
+# 密码:     a1b2c3d4e5f6...
+# 过期时间: 2026-05-14 10:00:00
+# 说明:     该密码仅可使用一次，登录成功后立即失效
+```
+
+也可一行命令完成：
+
+```bash
+docker compose exec score-backend ./classScore-backend gen-otp <username>
+```
+
+随后使用前端登录页，用该用户名 + 输出的密码登录即可。
+
+### 内部接口
+
+> 仅供本地 CLI 调用，需携带 `X-Admin-Token` header（来自 `data/admin.token`），生产环境不要将该接口暴露到公网。
+
+| 端点 | 方法 | 说明 |
+|------|------|------|
+| `/api/_internal/gen-otp` | POST | 为指定用户生成一次性密码（请求体 `{"username":"xxx"}`）|
+
 ## 部署指南
 
 ### 本地开发（Docker Compose）

@@ -6,6 +6,7 @@ import (
 	"strings"
 	"time"
 
+	"classScore-backend/internal/auth"
 	"classScore-backend/internal/config"
 	"classScore-backend/internal/model"
 	"classScore-backend/internal/store"
@@ -15,14 +16,18 @@ import (
 )
 
 type Handler struct {
-	config *config.Config
-	store  *store.SQLiteStore
+	config     *config.Config
+	store      *store.SQLiteStore
+	otp        *auth.OTPManager
+	adminToken string
 }
 
-func NewHandler(cfg *config.Config, s *store.SQLiteStore) *Handler {
+func NewHandler(cfg *config.Config, s *store.SQLiteStore, otp *auth.OTPManager, adminToken string) *Handler {
 	return &Handler{
-		config: cfg,
-		store:  s,
+		config:     cfg,
+		store:      s,
+		otp:        otp,
+		adminToken: adminToken,
 	}
 }
 
