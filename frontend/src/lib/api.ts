@@ -186,6 +186,8 @@ export interface ClassSettingsData {
   theme: string;
   animation_speed: string;
   sound_enabled: boolean;
+  roll_call_count: number;
+  roll_call_exclude_recent_count: number;
 }
 
 export interface RollCallData {
@@ -308,13 +310,15 @@ export const api = {
 
   // Settings
   getSettings: (classId: number) => get<ClassSettingsData>(`/api/classes/${classId}/settings`),
-  updateSettings: (classId: number, data: { theme?: string; animation_speed?: string; sound_enabled?: boolean }) =>
+  updateSettings: (classId: number, data: { theme?: string; animation_speed?: string; sound_enabled?: boolean; roll_call_count?: number; roll_call_exclude_recent_count?: number }) =>
     put<ClassSettingsData>(`/api/classes/${classId}/settings`, data),
 
   // Roll calls
   listRollCalls: (classId: number) => get<RollCallData[]>(`/api/classes/${classId}/roll-calls`),
   createRollCall: (classId: number, studentNames: string[]) =>
     post<RollCallData>(`/api/classes/${classId}/roll-calls`, { student_names: studentNames }),
+  createRandomRollCall: (classId: number, data: { count: number; exclude_recent_count: number }) =>
+    post<RollCallData>(`/api/classes/${classId}/roll-calls/random`, data),
 
   // Student profile
   getStudentProfile: () => get<{ student: StudentData; class: ClassData }>('/api/student/profile'),

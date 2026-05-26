@@ -73,6 +73,7 @@ func (s *SQLiteStore) migrate() error {
 		{1, func() error { _, err := s.db.Exec(migrationV1); return err }},
 		{2, s.migrateV2},
 		{3, s.migrateV3},
+		{4, s.migrateV4},
 	}
 
 	for _, m := range migrations {
@@ -270,6 +271,28 @@ func (s *SQLiteStore) migrateV3() error {
 		}
 	}
 	return nil
+}
+
+func (s *SQLiteStore) migrateV4() error {
+	if err := s.addClassSettingsColumnIfMissing("roll_call_count", "ALTER TABLE class_settings ADD COLUMN roll_call_count INTEGER DEFAULT 1"); err != nil {
+		return err
+	}
+	if err := s.addClassSettingsColumnIfMissing("roll_call_exclude_recent_count", "ALTER TABLE class_settings ADD COLUMN roll_call_exclude_recent_count INTEGER DEFAULT 1"); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (s *SQLiteStore) addClassSettingsColumnIfMissing(columnName, statement string) error {
+	var count int
+	if err := s.db.QueryRow("SELECT COUNT(*) FROM pragma_table_info('class_settings') WHERE name = ?", columnName).Scan(&count); err != nil {
+		return err
+	}
+	if count > 0 {
+		return nil
+	}
+	_, err := s.db.Exec(statement)
+	return err
 }
 
 func (s *SQLiteStore) migrateV2() error {

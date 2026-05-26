@@ -8,10 +8,11 @@ interface SettingsStore {
   loading: boolean;
 
   fetchSettings: (classId: number) => Promise<void>;
-  updateSettings: (classId: number, updates: { theme?: string; animation_speed?: string; sound_enabled?: boolean }) => Promise<void>;
+  updateSettings: (classId: number, updates: { theme?: string; animation_speed?: string; sound_enabled?: boolean; roll_call_count?: number; roll_call_exclude_recent_count?: number }) => Promise<void>;
 
   fetchRollCallHistory: (classId: number) => Promise<void>;
   addRollCallRecord: (classId: number, students: string[]) => Promise<RollCallData | null>;
+  createRandomRollCall: (classId: number, count: number, excludeRecentCount: number) => Promise<RollCallData>;
 
   setSettings: (settings: ClassSettingsData) => void;
   setRollCallHistory: (history: RollCallData[]) => void;
@@ -37,7 +38,9 @@ export const useSettingsStore = create<SettingsStore>()(
       const result = await api.updateSettings(classId, updates);
       if (result.success && result.data) {
         set({ settings: result.data });
+        return;
       }
+      throw new Error(result.error || '更新设置失败');
     },
 
     fetchRollCallHistory: async (classId) => {
@@ -56,6 +59,20 @@ export const useSettingsStore = create<SettingsStore>()(
         return result.data;
       }
       return null;
+    },
+
+    createRandomRollCall: async (classId, count, excludeRecentCount) => {
+      const result = await api.createRandomRollCall(classId, {
+        count,
+        exclude_recent_count: excludeRecentCount,
+      });
+      if (result.success && result.data) {
+        set((state) => ({
+          rollCallHistory: [result.data!, ...state.rollCallHistory].slice(0, 50),
+        }));
+        return result.data;
+      }
+      throw new Error(result.error || '点名失败');
     },
 
     setSettings: (settings) => set({ settings }),

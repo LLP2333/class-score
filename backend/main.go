@@ -160,6 +160,7 @@ func runServer(cfg *config.Config) {
 
 				// Roll call (write)
 				teacher.POST("/classes/:id/roll-calls", h.CreateRollCallRecord)
+				teacher.POST("/classes/:id/roll-calls/random", h.CreateRandomRollCall)
 
 				// Migration
 				teacher.GET("/migrate/check", h.CheckLegacyData)
