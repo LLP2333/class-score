@@ -31,3 +31,7 @@ out/
 dist/
 build/
 tmp/
+
+# Codegraph
+.codegraph/
+sync/

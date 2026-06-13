@@ -1,6 +1,7 @@
 export { StatsCard } from './StatsCard';
 export { StudentCard } from './StudentCard';
 export { ScoreModal } from './ScoreModal';
+export { BatchScoreModal } from './BatchScoreModal';
 export { AddStudentModal } from './AddStudentModal';
 export { StudentDetailModal } from './StudentDetailModal';
 export { PetDisplay, PetMini, PetEvolutionPreview, PetStageIcon } from './PetDisplay';

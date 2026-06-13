@@ -3,7 +3,7 @@
 import { cn, getAvatarClass } from '@/lib/utils';
 import type { Student } from '@/types';
 import { Button } from '@/components/ui/button';
-import { Plus, Minus } from 'lucide-react';
+import { Plus, Minus, Check } from 'lucide-react';
 import { usePetStore } from '@/store/usePetStore';
 import { PetMini } from './PetDisplay';
 
@@ -12,9 +12,20 @@ interface StudentCardProps {
   onAddScore?: () => void;
   onMinusScore?: () => void;
   onClick?: () => void;
+  selectable?: boolean;
+  selected?: boolean;
+  onToggleSelect?: () => void;
 }
 
-export function StudentCard({ student, onAddScore, onMinusScore, onClick }: StudentCardProps) {
+export function StudentCard({
+  student,
+  onAddScore,
+  onMinusScore,
+  onClick,
+  selectable = false,
+  selected = false,
+  onToggleSelect,
+}: StudentCardProps) {
   const { config, getStudentPet, getPetStage, getPetSpecies } = usePetStore();
   const pet = getStudentPet(student.id);
   const stage = pet ? getPetStage(student.id, student.total_score) : null;
@@ -24,12 +35,24 @@ export function StudentCard({ student, onAddScore, onMinusScore, onClick }: Stud
   return (
     <div
       className={cn(
-        'bg-card rounded-xl p-4 shadow-sm border border-border',
+        'relative bg-card rounded-xl p-4 shadow-sm border border-border',
         'flex flex-col items-center gap-2 cursor-pointer',
-        'hover:shadow-md hover:border-primary/30 transition-all'
+        'hover:shadow-md hover:border-primary/30 transition-all',
+        selectable && selected && 'border-primary ring-2 ring-primary/40 bg-primary/5'
       )}
-      onClick={onClick}
+      onClick={selectable ? onToggleSelect : onClick}
     >
+      {selectable && (
+        <div
+          className={cn(
+            'absolute top-2 right-2 z-10 w-5 h-5 rounded-full border flex items-center justify-center transition-colors',
+            selected ? 'bg-primary border-primary text-white' : 'bg-background border-border'
+          )}
+        >
+          {selected && <Check className="h-3.5 w-3.5" />}
+        </div>
+      )}
+
       <div className="relative">
         <div
           className={cn(
@@ -55,7 +78,7 @@ export function StudentCard({ student, onAddScore, onMinusScore, onClick }: Stud
         {student.total_score}分
       </div>
       
-      {(onAddScore || onMinusScore) && (
+      {!selectable && (onAddScore || onMinusScore) && (
         <div className="flex gap-2 w-full" onClick={(e) => e.stopPropagation()}>
           {onAddScore && (
             <Button
